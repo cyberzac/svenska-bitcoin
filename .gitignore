@@ -6,3 +6,4 @@ tmp
 *.iml
 .idea/
 .idea_modules/
+dist/
