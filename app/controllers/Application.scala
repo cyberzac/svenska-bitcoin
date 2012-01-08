@@ -8,12 +8,13 @@ import views._
 
 object Application extends Controller {
 
-  val registerForm = Form(
-    of(
-      "name" -> text,
-      "email" -> email
+  val buyForm = Form(
+    of (
+      "amount" -> text,
+      "address" -> text
+    )
   )
-  )
+
 
   // -- Actions
 
@@ -21,19 +22,21 @@ object Application extends Controller {
    * Home page
    */
   def index = Action {
-    Ok(html.index(registerForm))
+    Ok(html.index())
   }
 
-  /**
-   * Handles the form submission.
-   */
-  def register = Action {
+  def about = Action {
+    Ok(html.about())
+  }
+
+def buy = Action {
     implicit request =>
-      registerForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.index(formWithErrors)), {
-        case (name, email) => {
-          Logger.info("%s, %s".format(name, email))
-          Ok(html.registered(name))
+      buyForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(html.buy(formWithErrors)), {
+        case (amount, address) => {
+          val reference = "4711"
+          Logger.info("%s, %s, %s".format(amount, address, reference))
+          Ok(html.pay(amount, address, reference))
         }
       }
       )

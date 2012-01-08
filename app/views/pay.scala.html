@@ -1,0 +1,12 @@
+@(amount:String, address:String, reference: String)
+@main("Betalning") {
+  <p>
+    Sätt in @amount kr på SEB 1234 56 789, ange @reference.
+    Kontrollera att @address är korrekt mottagingsadress.
+  </p>
+
+<p class="buttons">
+    <a href="@routes.Application.index">Tillbaka</a>
+</p>
+
+}

@@ -1,0 +1,27 @@
+@(buyForm: Form[(String,String)])
+@import helper._
+@main(title = "Svenska Bitcoin") {
+
+<h1>Köpa bitcoin</h1>
+<p>
+    Vi säljer bitcoin till marknadspris. Du säger hur mycket du vill köpa för.
+    Priset per bitcoin avgörs när vi mottagit pengarna, vi överför då bitcoinen till adressen du anget.
+    <em>Var nog när du anger din mottagningsadress.</em>
+</p>
+
+   @form(action = routes.Application.buy, args = 'id -> "buy") {
+       @inputText(
+           field = buyForm("amount"),
+           args = 'label -> "Belopp i kr"
+       )
+
+       @inputText(
+           field = buyForm("address"),
+           args = 'label -> "Bitcoin adress"
+       )
+
+   <p class="buttons">
+        <input type="submit">
+    <p>
+    }
+}

@@ -12,10 +12,19 @@
         <header>
             <a href="@routes.Application.index">@title</a>
         </header>
-        <section>
+        <nav>
+            <ul>
+                <li><a href="buy">Köpa</a></li>
+                <li><a href="sell">Sälja</a></li>
+                <li><a href="about">Om oss</a></li>
+                <li><a href="bitcoin">Bitcoin</a><li>
+            </ul>
+        </nav>
+        <section id="main">
             @content
         </section>
          <footer>
+            <hr/>
          Svenska Bitcoin, <a href="mailto:info@@svenskabitcoin.se">info@@svenskabitcoin.se</a>
           </footer>
     </body>
