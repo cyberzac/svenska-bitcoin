@@ -43,7 +43,7 @@ object Application extends Controller {
       formWithErrors => BadRequest(html.buy(formWithErrors)), {
         case (amount, address) => {
           val reference = "4711"
-          Logger.info("Buy: %s, %s, %s".format(amount, address, reference))
+          Logger.info("Buy: %s SEK -> %s, %s".format(amount, address, reference))
           Ok(html.pay(amount, address, reference))
         }
       }
@@ -56,7 +56,7 @@ object Application extends Controller {
       formWithErrors => BadRequest(html.sell(formWithErrors)), {
         case (amount, bank, account) => {
           val address = "1x17"
-          Logger.info("Sell: %s, %s, %s".format(amount, bank, account))
+          Logger.info("Sell: %s BTC -> %s, %s:%s".format(amount, address, bank, account))
           Ok(html.receive(amount, address, bank, account))
         }
       }
