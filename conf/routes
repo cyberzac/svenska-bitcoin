@@ -5,10 +5,13 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /about                  controllers.Application.about
-GET     /buy                     controllers.Application.buy
 
 # Buy
+GET     /buy                     controllers.Application.buy
 #POST    /buy                    controllers.Application.buy
+
+#Sell
+GET     /sell                     controllers.Application.sell
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

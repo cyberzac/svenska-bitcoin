@@ -1,0 +1,29 @@
+@(sellForm: Form[(String,String,String)])
+@import helper._
+@main(title = "Svenska Bitcoin") {
+<p>
+    Vi köper bitcoin till marknadspris. Du överför bitcoin till oss .
+    Priset per bitcoin avgörs när vi har 6 confirms, vi överför då pengarna till kontot du anget.
+</p>
+
+   @form(action = routes.Application.sell, args = 'id -> "sell") {
+       @inputText(
+           field = sellForm("amount"),
+           args = 'label -> "Belopp i BTC"
+       )
+
+    @inputText(
+        field = sellForm("bank"),
+        args = 'label -> "Bank"
+    )
+
+    @inputText(
+       field = sellForm("account"),
+       args = 'label -> "Konto"
+)
+
+   <p class="buttons">
+        <input type="submit" value="Sälj">
+    <p>
+    }
+}

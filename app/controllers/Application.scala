@@ -15,6 +15,14 @@ object Application extends Controller {
     )
   )
 
+  val sellForm = Form(
+    of (
+      "amount" -> text,
+      "bank" -> text,
+      "account" -> text
+    )
+  )
+
 
   // -- Actions
 
@@ -29,19 +37,31 @@ object Application extends Controller {
     Ok(html.about())
   }
 
-def buy = Action {
+  def buy = Action {
     implicit request =>
       buyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(html.buy(formWithErrors)), {
         case (amount, address) => {
           val reference = "4711"
-          Logger.info("%s, %s, %s".format(amount, address, reference))
+          Logger.info("Buy: %s, %s, %s".format(amount, address, reference))
           Ok(html.pay(amount, address, reference))
         }
       }
       )
   }
 
+  def sell = Action {
+    implicit request =>
+      sellForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(html.sell(formWithErrors)), {
+        case (amount, bank, account) => {
+          val address = "1x17"
+          Logger.info("Sell: %s, %s, %s".format(amount, bank, account))
+          Ok(html.receive(amount, address, bank, account))
+        }
+      }
+      )
+  }
 
 }
 

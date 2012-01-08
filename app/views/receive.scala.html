@@ -1,0 +1,12 @@
+@(amount:String, address:String, bank:String, account: String)
+@main("Utbetalning") {
+  <p>
+    Överför in @amount BTC på @address
+    Kontrollera att @bank @account är rätt.
+  </p>
+
+<p class="buttons">
+    <a href="@routes.Application.index">Ok</a>
+</p>
+
+}
