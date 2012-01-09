@@ -6,7 +6,7 @@ import play.Logger
 
 import views._
 
-object Application extends Controller {
+object Application extends Controller with Secured {
 
   val buyForm = Form(
     of (
@@ -23,18 +23,13 @@ object Application extends Controller {
     )
   )
 
-
   // -- Actions
 
   /**
    * Home page
    */
-  def index = Action {
-    Ok(html.index())
-  }
-
-  def about = Action {
-    Ok(html.about())
+  def home = Action {
+    Ok(html.home())
   }
 
   def buy = Action {
