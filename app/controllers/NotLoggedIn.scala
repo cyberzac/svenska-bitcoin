@@ -2,6 +2,7 @@ package controllers
 
 import play.api.mvc._
 import play.api.data._
+import play.Logger
 
 import views._
 
@@ -22,14 +23,27 @@ object NotLoggedIn extends Controller {
     Ok(html.bitcoin())
   }
 
-// -- Authentication
+
+  val registerForm = Form(
+    of(
+      "email" -> text,
+      "password" -> text,
+      "password2" -> text
+    ) verifying("Lösenorden är olika", result => result match {
+      case (email, password, password2) => password == password2
+    })
+  )
+  // -- Authentication
 
   val loginForm = Form(
     of(
       "email" -> text,
       "password" -> text
-    ) verifying("Invalid email or password", result => result match {
-      case (email, password) => email == password
+    ) verifying("Felaktig inlogging", result => result match {
+      case (email, password) => {
+        Logger.debug("login %s:%s".format(email, password))
+        email == "zac@cyberzac.se" && password == "secret"
+      }
     })
   )
 
@@ -48,18 +62,41 @@ object NotLoggedIn extends Controller {
     implicit request =>
       loginForm.bindFromRequest.fold(
         formWithErrors => BadRequest(html.login(formWithErrors)),
-        user => Redirect(routes.Application.home).withSession("email" -> user._1)
+        form => Redirect(routes.Application.home()).withSession("email" -> form._1)
       )
   }
 
   /**
-   * Logout and clean the session.
+   * Registration page
    */
-  def logout = Action {
-    Redirect(routes.NotLoggedIn.login).withNewSession.flashing(
-      "success" -> "You've been logged out"
-    )
+  def register = Action {
+    implicit request =>
+      Ok(html.register(registerForm))
   }
+
+  /**
+   * Handle login form submission.
+   */
+  def registerUser = Action {
+    implicit request =>
+      registerForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(html.register(formWithErrors)),
+      {
+        case (email, password, password2) =>
+          Logger.info("Registering user %s, password %s".format(email, password))
+          Redirect(routes.Application.home).withSession("email" -> email)
+      }
+  )
+}
+
+/**
+ * Logout and clean the session.
+ */
+def logout = Action {
+Redirect (routes.NotLoggedIn.login).withNewSession.flashing (
+"success" -> "You've been logged out"
+)
+}
 }
 
 /**
@@ -75,7 +112,7 @@ trait Secured extends Security.AllAuthenticated {
   /**
    * Redirect to login if the use in not authorized.
    */
-  override def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.NotLoggedIn.login)
+  override def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.NotLoggedIn.login())
 
 }
 

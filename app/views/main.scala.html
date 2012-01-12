@@ -9,21 +9,23 @@
     </head>
     <body>
         <header>
-            <a href="@routes.Application.home" id="logo">NotLoggedIn@title</a>
+            <a href="@routes.Application.home" id="logo">@title</a>
         </header>
+
         <nav>
             <ul>
                 <li><a href="buy">Köpa</a></li>
                 <li><a href="sell">Sälja</a></li>
+                <li><a href="login">Logga in</a></li>
                 <li><a href="about">Om oss</a></li>
                 <li><a href="bitcoin">Om Bitcoin</a><li>
             </ul>
         </nav>
+
         <section id="main">
             @content
         </section>
          <footer>
-            <hr/>
          Svenska Bitcoin, <a href="mailto:info@@svenskabitcoin.se">info@@svenskabitcoin.se</a>
           </footer>
     </body>

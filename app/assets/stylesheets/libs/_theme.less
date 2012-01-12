@@ -5,8 +5,12 @@
 // -----------------------------------
 
 // ---------------------------- COLORS
+// Conversion from   http://www.mws-design.ch/mws_WEBDESIGN/Grundlagen/Umrechnen/ncs2rgb_neu.htm
+@sv_yellow:               #fce830;   // NCS 0580-Y10R
+@sv_blue:                   #4c45ca;   // NCS 4055-R95B
+
 @mainBackground:        #c7d1d8;
-@mainColor:             #2a3a48;
+@mainColor:             @sv_blue;
 @drawerBackground:      #e1e7ec;
 @folderColor:           #6f8193;
 @projectColor:          @mainColor;
@@ -15,8 +19,8 @@
 @links:                 #4794c4;
 @linksHover:            #2a5e88;
 
-@headerLight:           #445868;
-@headerDark:            @mainColor;
+@headerLight:          @mainColor;
+@headerDark:           @mainColor;
 @titleColor:            #556b7b;
 @buttonColor:           @mainBackground;
 @buttonHover:           #fff;
@@ -31,6 +35,7 @@
 @panBorder:             #333;
 @panButtonBackground:   #444;
 @panButtonColor:        #fff;
+
 
 // ----------------------------- FONTS
 @defaultFont:           13px "Lucida Grande","Helvetica Neue", sans-serif;

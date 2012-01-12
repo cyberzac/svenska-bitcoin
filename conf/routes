@@ -7,15 +7,16 @@ GET     /about                  controllers.NotLoggedIn.about
 GET     /bitcoin                controllers.NotLoggedIn.bitcoin
 
 # Authentication
-GET     /login                   controllers.NotLoggedIn.login
+GET     /login                  controllers.NotLoggedIn.login
 POST    /login                  controllers.NotLoggedIn.authenticate
+GET    /register               controllers.NotLoggedIn.register
+POST    /register              controllers.NotLoggedIn.registerUser
 GET     /logout                controllers.NotLoggedIn.logout
-
 #
 # Logged in
 #
 # Home
-GET     /home                           controllers.Application.home
+GET     /home                  controllers.Application.home
 
 # Buy
 GET     /buy                     controllers.Application.buy
