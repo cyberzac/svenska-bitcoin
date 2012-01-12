@@ -1,0 +1,27 @@
+@(form: Form[(String,String,String)])(implicit flash: Flash)
+@main(title = "Svenska Bitcoin") {
+
+<article>
+
+    <h1>Registrera dig på Svenska Bitcoin</h1>
+    Svenska Bitcoin kommer inte lämna ut dessa uppgifter till någon såvida
+    vi inte bryter mot Svensk lag.
+
+    @helper.form(routes.NotLoggedIn.registerUser) {
+    @form.globalError.map { error =>
+    <p class="error"> @error.message </p>
+    }
+    @flash.get("success").map { message =>
+    <p class="success"> @message </p>
+    }
+    <p><input type="text" name="name" placeholder="Förnamn Efternamn" value="@form("name").value"></p>
+    <p><input type="email" name="email" placeholder="Email" value="@form("email").value">Detta blir ditt användarnamn</p>
+    <p><input type="password" name="password" placeholder="Password"></p>
+    <p><input type="password" name="password2" placeholder="Password"></p>
+    <p><input type="text" name="bankAccount" placeholder="Bankkonto" value="@form("bankAccount").value">Konto för utbetalningar vid försäljning</p>
+    <p> <button type="submit">Registrera</button> </p>
+    }
+
+</article>
+}
+
