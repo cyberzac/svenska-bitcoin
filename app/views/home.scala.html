@@ -1,6 +1,4 @@
-@import helper._
-@main(title = "Svenska Bitcoin") {
-    Välkommen användare!
-
-
+@(user: Option[org.bitcex.model.User])
+@main(user=user) {
+    V&auml;lkommen @user.get.name!
 }

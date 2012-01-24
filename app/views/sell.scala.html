@@ -1,9 +1,9 @@
-@(sellForm: Form[(String,String,String)])
+@(user:Option[org.bitcex.model.User], sellForm: Form[(String,String,String)])
 @import helper._
-@main(title = "Svenska Bitcoin") {
+@main("sell", user){
 <p>
-    Vi köper bitcoin till marknadspris. Du överför bitcoin till oss .
-    Priset per bitcoin avgörs när vi mottagit överföringen, vi överför då pengarna till kontot du anget.
+    Vi k&ouml;per bitcoin till marknadspris. Du &ouml;verf&ouml;r bitcoin till oss .
+    Priset per bitcoin avg&ouml;rs n&auml;r vi mottagit &ouml;verf&ouml;ringen, vi &ouml;verf&ouml;r d&aring; pengarna till kontot du anget.
 </p>
 
    @form(action = routes.Application.sell, args = 'id -> "sell") {
@@ -23,7 +23,7 @@
 )
 
    <p class="buttons">
-        <input type="submit" value="Sälj">
+        <input type="submit" value="S&auml;lj">
     <p>
     }
 }

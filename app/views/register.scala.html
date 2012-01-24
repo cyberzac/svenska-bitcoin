@@ -1,11 +1,9 @@
 @(form: Form[(String,String,String)])(implicit flash: Flash)
-@main(title = "Svenska Bitcoin") {
+@main() {
 
-<article>
-
-    <h1>Registrera dig på Svenska Bitcoin</h1>
-    Svenska Bitcoin kommer inte lämna ut dessa uppgifter till någon såvida
-    vi inte bryter mot Svensk lag.
+    <h1>Registrera dig p&aring; Svenska Bitcoin</h1>
+    Svenska Bitcoin kommer inte l&auml;mna ut dessa uppgifter till n&aring;gon s&aring;vida
+    vi inte bryter mot svensk lag.
 
     @helper.form(routes.NotLoggedIn.registerUser) {
     @form.globalError.map { error =>
@@ -14,14 +12,12 @@
     @flash.get("success").map { message =>
     <p class="success"> @message </p>
     }
-    <p><input type="text" name="name" placeholder="Förnamn Efternamn" value="@form("name").value"></p>
-    <p><input type="email" name="email" placeholder="Email" value="@form("email").value">Detta blir ditt användarnamn</p>
+    <p><input type="text" name="name" placeholder="F&ouml;rnamn Efternamn" value="@form("name").value"></p>
+    <p><input type="email" name="email" placeholder="Email" value="@form("email").value">Detta blir ditt anv&auml;ndarnamn</p>
     <p><input type="password" name="password" placeholder="Password"></p>
     <p><input type="password" name="password2" placeholder="Password"></p>
-    <p><input type="text" name="bankAccount" placeholder="Bankkonto" value="@form("bankAccount").value">Konto för utbetalningar vid försäljning</p>
+    <p><input type="text" name="bankAccount" placeholder="Bankkonto" value="@form("bankAccount").value">Konto f&ouml;r utbetalningar vid f&ouml;rs&auml;ljning</p>
     <p> <button type="submit">Registrera</button> </p>
     }
-
-</article>
 }
 

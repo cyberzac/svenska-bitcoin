@@ -5,6 +5,7 @@ import play.api.data._
 import play.Logger
 
 import views._
+import models.PlayUserService
 
 object NotLoggedIn extends Controller {
 
@@ -29,7 +30,7 @@ object NotLoggedIn extends Controller {
       "email" -> text,
       "password" -> text,
       "password2" -> text
-    ) verifying("Lösenorden är olika", result => result match {
+    ) verifying("L&ouml;senorden &auml;r olika", result => result match {
       case (email, password, password2) => password == password2
     })
   )
@@ -42,7 +43,7 @@ object NotLoggedIn extends Controller {
     ) verifying("Felaktig inlogging", result => result match {
       case (email, password) => {
         Logger.debug("login %s:%s".format(email, password))
-        email == "zac@cyberzac.se" && password == "secret"
+        PlayUserService.getUserActor(email, password).isDefined
       }
     })
   )
@@ -80,23 +81,13 @@ object NotLoggedIn extends Controller {
   def registerUser = Action {
     implicit request =>
       registerForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.register(formWithErrors)),
-      {
+      formWithErrors => BadRequest(html.register(formWithErrors)), {
         case (email, password, password2) =>
           Logger.info("Registering user %s, password %s".format(email, password))
           Redirect(routes.Application.home).withSession("email" -> email)
       }
-  )
-}
-
-/**
- * Logout and clean the session.
- */
-def logout = Action {
-Redirect (routes.NotLoggedIn.login).withNewSession.flashing (
-"success" -> "You've been logged out"
-)
-}
+      )
+  }
 }
 
 /**

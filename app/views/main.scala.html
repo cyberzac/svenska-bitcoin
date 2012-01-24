@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String = "Svenska Bitcoin", user:Option[org.bitcex.model.User] = None )(content: Html)
 <!DOCTYPE html>
 <html lang="sv">
     <head>
@@ -10,20 +10,32 @@
     <body>
         <header>
             <a href="@routes.Application.home" id="logo">@title</a>
+            @if(user.isDefined) {
+            <dl id="user">
+                <dt>@user.get.name <span>(@user.get.email)</span></dt>
+                <dd>
+                    <a href="@routes.Application.logout()">Logout</a>
+                </dd>
+            </dl>
+            }
         </header>
 
         <nav>
+            <section>
             <ul>
-                <li><a href="buy">Köpa</a></li>
-                <li><a href="sell">Sälja</a></li>
+                <li><a href="buy">K&ouml;pa</a></li>
+                <li><a href="sell">S&auml;lja</a></li>
                 <li><a href="login">Logga in</a></li>
                 <li><a href="about">Om oss</a></li>
                 <li><a href="bitcoin">Om Bitcoin</a><li>
             </ul>
+            </section>
         </nav>
 
         <section id="main">
+            <article>
             @content
+            </article>
         </section>
          <footer>
          Svenska Bitcoin, <a href="mailto:info@@svenskabitcoin.se">info@@svenskabitcoin.se</a>

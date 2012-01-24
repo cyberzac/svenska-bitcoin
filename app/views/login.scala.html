@@ -1,9 +1,8 @@
 @(form: Form[(String,String)])(implicit flash: Flash)
-@main(title = "Svenska Bitcoin") {
+@main() {
 
-<article>
-    <section>
-        För att kunna handla på Svenska bitcoin behöver du logga in.
+    <section id="login">
+        F&ouml;r att kunna handla p&aring; Svenska bitcoin beh&ouml;ver du logga in.
 
         @helper.form(routes.NotLoggedIn.authenticate) {
         @form.globalError.map { error =>
@@ -28,8 +27,8 @@
         }
     </section>
 
-    <section>
-        <p>Registrera ny användare</p>
+    <section id="register">
+        <p>Registrera ny anv&auml;ndare</p>
         <form action="register">
             <p>
                 <button type="submit">Registrera</button>
@@ -37,6 +36,5 @@
         </form>
     </section>
 
-</article>
 }
 

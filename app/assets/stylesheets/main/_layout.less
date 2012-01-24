@@ -19,8 +19,16 @@ body {
         left: 0;
         width: @navigationWidth;
         box-sizing: border-box;
+        padding: 20px;
     }
     & > section {
+        position: absolute;
+        top: @headerHeight;
+        left: @navigationWidth;
+        right: 0;
+        bottom: @footerHeight;
+    }
+    & > article {
         position: absolute;
         top: @headerHeight;
         left: @navigationWidth;
@@ -47,7 +55,7 @@ body {
 
 #main > article {
     position: absolute;
-    top: 40px;
+    top: @headerHeight;
     left: 0;
     bottom: 0;
     right: 0;

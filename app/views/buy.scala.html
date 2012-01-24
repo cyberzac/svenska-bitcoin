@@ -1,11 +1,10 @@
-@(buyForm: Form[(String,String)])
+@(user: Option[org.bitcex.model.User], buyForm: Form[(String,String)])
 @import helper._
-@main(title = "Svenska Bitcoin") {
-<article>
+@main(user=user) {
     <p>
-        Vi säljer bitcoin till marknadspris. Du säger hur mycket du vill köpa för.
-        Priset per bitcoin avgörs när vi mottagit pengarna, vi överför då bitcoinen till adressen du anget.
-        <em>Var noga när du anger din mottagningsadress.</em>
+        Vi s&auml;ljer bitcoin till marknadspris. Du s&auml;ger hur mycket du vill k&ouml;pa f&ouml;r.
+        Priset per bitcoin avg&ouml;rs n&auml;r vi mottagit pengarna, vi &ouml;verf&ouml;r d&aring; bitcoinen till adressen du anget.
+        <em>Var noga n&auml;r du anger din mottagningsadress.</em>
     </p>
 
     @form(action = routes.Application.buy, args = 'id -> "buy") {
@@ -20,9 +19,7 @@
     )
 
     <p class="buttons">
-        <input type="submit" value="Köp">
-
+        <input type="submit" value="K&ouml;p">
     <p>
-</article>
 }
 }
