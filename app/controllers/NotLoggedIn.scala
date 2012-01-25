@@ -13,15 +13,24 @@ object NotLoggedIn extends Controller {
    * Index page
    */
   def index = Action {
-    Ok(html.index())
+    request => {
+      val user = PlayUserService.getUserInSession(request)
+      Ok(html.index(user))
+    }
   }
 
   def about = Action {
-    Ok(html.about())
+    request => {
+      val user = PlayUserService.getUserInSession(request)
+      Ok(html.about(user))
+    }
   }
 
   def bitcoin = Action {
-    Ok(html.bitcoin())
+    request => {
+      val user = PlayUserService.getUserInSession(request)
+      Ok(html.bitcoin(user))
+    }
   }
 
 
@@ -34,8 +43,8 @@ object NotLoggedIn extends Controller {
       case (email, password, password2) => password == password2
     })
   )
-  // -- Authentication
 
+  // -- Authentication
   val loginForm = Form(
     of(
       "email" -> text,
@@ -63,7 +72,9 @@ object NotLoggedIn extends Controller {
     implicit request =>
       loginForm.bindFromRequest.fold(
         formWithErrors => BadRequest(html.login(formWithErrors)),
-        form => Redirect(routes.Application.home()).withSession("email" -> form._1)
+        form => {
+          Redirect(routes.Application.home()).withSession("email" -> form._1)
+        }
       )
   }
 
@@ -84,7 +95,7 @@ object NotLoggedIn extends Controller {
       formWithErrors => BadRequest(html.register(formWithErrors)), {
         case (email, password, password2) =>
           Logger.info("Registering user %s, password %s".format(email, password))
-          Redirect(routes.Application.home).withSession("email" -> email)
+          Redirect(routes.Application.home()).withSession("email" -> email)
       }
       )
   }

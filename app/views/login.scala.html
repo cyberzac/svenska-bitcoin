@@ -2,7 +2,8 @@
 @main() {
 
     <section id="login">
-        F&ouml;r att kunna handla p&aring; Svenska bitcoin beh&ouml;ver du logga in.
+        <p>Svenska bitcoin är endast öppet för betatestare.<p/>
+        <p>Vill du bli testare skicka ett <a href="mailto:info@@svenskabitcoin.se">mejl</a> till oss.</p>
 
         @helper.form(routes.NotLoggedIn.authenticate) {
         @form.globalError.map { error =>
@@ -27,14 +28,14 @@
         }
     </section>
 
-    <section id="register">
+    <!--section id="register">
         <p>Registrera ny anv&auml;ndare</p>
         <form action="register">
             <p>
                 <button type="submit">Registrera</button>
             </p>
         </form>
-    </section>
+    </section-->
 
 }
 
