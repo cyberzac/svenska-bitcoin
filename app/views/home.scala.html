@@ -1,4 +1,9 @@
-@(user: Option[org.bitcex.model.User])
-@main(user=user) {
-    V&auml;lkommen @user.get.name.value!
+@(user: org.bitcex.model.User)
+@main(user=Some(user)) {
+   <p> V&auml;lkommen @user.name.value!</p>
+   <table>
+       <tr><th>Valuta</th><th>Saldo</th></tr>
+       <tr><td>SEK</td><td>@user.sek.amount</td></tr>
+       <tr><td>BTC</td><td>@user.btc.amount</td></tr>
+   </table>
 }

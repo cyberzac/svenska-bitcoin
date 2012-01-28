@@ -30,9 +30,14 @@ object Application extends Controller with Secured {
   /**
    * Home page
    */
-  def home = Action { request =>
-    val user = PlayUserService.getUserInSession(request)
-    Ok(html.home(user))
+  def home = Action {
+    request =>
+      val user = PlayUserService.getUserInSession(request)
+      if (user.isDefined) {
+        Ok(html.home(user.get))
+      } else {
+        BadRequest("Not logged in")
+      }
   }
 
   def buy = Action {
