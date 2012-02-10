@@ -1,0 +1,25 @@
+@(user:org.bitcex.model.User, askForm: Form[(String,String)])
+@import helper._
+@main(user=Some(user)){
+
+<p>
+  S&auml;ljorder
+</p>
+
+   @form(action = routes.PlayOrderBook.ask, args = 'id -> "ask") {
+       @inputText(
+           field = askForm("amount"),
+           args = 'label -> "Belopp i BTC"
+       )
+
+    @inputText(
+        field = askForm("price"),
+        args = 'label -> "Pris SEK/BTC"
+    )
+
+
+   <p class="buttons">
+        <input type="submit" value="S&auml;lj">
+    <p>
+    }
+}

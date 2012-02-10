@@ -5,7 +5,6 @@ import akka.actor.{ActorRef, TypedActor}
 import akka.actor.Actor._
 import org.bitcex.model._
 import play.api.mvc.{Request, AnyContent}
-import play.api.Play
 
 object PlayUserService {
 
@@ -33,7 +32,8 @@ object PlayUserService {
     if (userRef.isDefined) {
       return userRef
     }
-    val actorRef = actorOf(new UserActor(user))
+    val actorRef = actorOf(new UserActor(user, userServiceActor))
+    actorRef.start()
     userActors = userActors + (email -> actorRef)
     Some(actorRef)
   }
@@ -41,6 +41,10 @@ object PlayUserService {
   def getUserInSession(implicit request: Request[AnyContent]): Option[User] =  {
     val email = request.username.getOrElse(return None)
     userServiceActor.findByEmail(email)
+  }
+  def getUserActorInSession(implicit request: Request[AnyContent]): Option[ActorRef] =  {
+    val email = request.username.getOrElse(return None)
+    userActors.get(email)
   }
 
 }

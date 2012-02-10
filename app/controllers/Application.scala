@@ -31,7 +31,7 @@ object Application extends Controller with Secured {
    * Home page
    */
   def home = Action {
-    request =>
+    implicit request =>
       val user = PlayUserService.getUserInSession(request)
       if (user.isDefined) {
         Ok(html.home(user.get))

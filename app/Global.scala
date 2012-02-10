@@ -1,10 +1,9 @@
-import akka.camel.CamelContextManager
-import akka.camel.CamelServiceManager._
-import akka.actor.Actor._
-import org.bitcex.camel._
 import play.api.{Application, GlobalSettings}
 
 object Global extends GlobalSettings {
+   //Todo alias models
+ // type SEK = org.bitcex.model.SEK
+
   override def onStart(app: Application) {
 /*
     val tickerActor = actorOf[TickerActor]

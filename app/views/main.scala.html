@@ -23,10 +23,16 @@
         <nav>
             <section>
             <ul>
-                <li><a href="buy">K&ouml;pa</a></li>
-                <li><a href="sell">S&auml;lja</a></li>
-
-                <li><a href="login">Logga in</a></li>
+                <li><a href="buy">Direktk&ouml;p</a></li>
+                <li><a href="sell">Direktf&ouml;rs&auml;ljning</a></li>
+                @if(user.isDefined) {
+                    <li><a href="bid">K&ouml;porder</a></li>
+                    <li><a href="ask">S&auml;ljorder</a></li>
+                    <li><a href="@routes.Application.home()">Saldo</a></li>
+                    <li><a href="@routes.PlayOrderBook.userOrders()">Order</a></li>
+                } else {
+                    <li><a href="login">Logga in</a></li>
+                }
                 <li><a href="about">Om oss</a></li>
                 <li><a href="bitcoin">Om Bitcoin</a><li>
             </ul>

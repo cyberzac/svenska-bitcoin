@@ -1,0 +1,23 @@
+@(user: org.bitcex.model.User, bidForm: Form[(String,String)])
+@import helper._
+@main(user=Some(user)) {
+    <p>
+      K&ouml;porder.
+    </p>
+
+    @form(action = routes.PlayOrderBook.bid, args = 'id -> "buy") {
+    @inputText(
+    field = bidForm("amount"),
+    args = 'label -> "Belopp BTC"
+    )
+
+    @inputText(
+    field = bidForm("price"),
+    args = 'label -> "Pris i SEK"
+    )
+
+    <p class="buttons">
+        <input type="submit" value="K&ouml;p">
+    <p>
+}
+}

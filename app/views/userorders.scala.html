@@ -1,0 +1,8 @@
+@(user: org.bitcex.model.User, asks: List[org.bitcex.model.AskOrder[org.bitcex.model.BTC,org.bitcex.model.SEK]], bids:List[org.bitcex.model.BidOrder[org.bitcex.model.BTC,org.bitcex.model.SEK]])
+@main(user=Some(user)) {
+   <table>
+       <tr><th>Date</th><th>Order</th></tr>
+       @asks.map { ask =>  @views.html.order("Saelj", ask) }
+       @bids.map { bid =>  @views.html.order("Koep", bid) }
+   </table>
+}

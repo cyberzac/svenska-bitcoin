@@ -1,6 +1,5 @@
 @(user: org.bitcex.model.User)
 @main(user=Some(user)) {
-   <p> V&auml;lkommen @user.name.value!</p>
    <table>
        <tr><th>Valuta</th><th>Saldo</th></tr>
        <tr><td>SEK</td><td>@user.sek.amount</td></tr>
