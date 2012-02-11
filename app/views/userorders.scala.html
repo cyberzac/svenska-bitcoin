@@ -2,7 +2,7 @@
 @main(user=Some(user)) {
    <table>
        <tr><th>Date</th><th>Order</th></tr>
-       @asks.map { ask =>  @views.html.order("Saelj", ask) }
-       @bids.map { bid =>  @views.html.order("Koep", bid) }
+       @asks.map { ask =>  @views.html.order("Sälj", ask) }
+       @bids.map { bid =>  @views.html.order("Köp", bid) }
    </table>
 }
