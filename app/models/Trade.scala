@@ -1,5 +1,7 @@
 package models
 
+import org.joda.time.DateTime
+
 
 object Trade {
 
@@ -16,8 +18,21 @@ object Trade {
   }
 }
 
-// Todo need state for confirmations? How to ensure that there is funds to cover this for seller and buyer
 case class Trade[A <: Currency[A], P <: Currency[P]](time: Long, id: TradeId, amount: A, price: P, sellerId: UserId, buyerId: UserId) {
+  def toUserTrade(userId:UserId):UserTrade[A, P]  = UserTrade[A, P](this, userId)
+}
+
+object UserTrade {
+  def apply[A <: Currency[A], P <: Currency[P]](trade:Trade[A, P], userId:UserId):UserTrade[A, P] = {
+      trade match {
+        case Trade(time, tid, amount, price, `userId`, buyer) => new UserTrade(time, tid, -amount, price, userId)
+        case Trade(time, tid, amount, price, seller, `userId`) => new UserTrade(time, tid, amount, -price, userId)
+      }
+  }
+}
+
+case class UserTrade[A <: Currency[A], P <: Currency[P]](time: Long, id: TradeId, amount: A, price: P, userId:UserId) {
+  def dateTime: DateTime = new DateTime(time)
   val total = price * amount.value
 }
 

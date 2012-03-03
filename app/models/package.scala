@@ -1,4 +1,3 @@
-
 package object models {
 
   implicit def stringToName(name: String) = Name(name)

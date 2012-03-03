@@ -11,7 +11,7 @@ class TradeSpec extends Specification {
 
   "A Trade " should {
 
-      val trade = Trade(askOrder, bidOrder, SEK(45))
+    val trade = Trade(askOrder, bidOrder, SEK(45))
     "Be created from orders with correct amount" in {
       trade.amount must_== BTC(6)
     }
@@ -19,10 +19,18 @@ class TradeSpec extends Specification {
       trade.price must_== SEK(45)
     }
 
-   "Be created from orders with correct total" in {
-      trade.total must_== SEK(6*45)
+    "Create a UserTrade when buyer" in {
+      val userTrade = trade.toUserTrade(buyer)
+      userTrade.time must_== trade.time
+      userTrade.amount must_== trade.amount
+      userTrade.price must_== -trade.price
     }
 
+    "Create a UserTrade when seller" in {
+      val userTrade = trade.toUserTrade(seller)
+      userTrade.time must_== trade.time
+      userTrade.amount must_== -trade.amount
+      userTrade.price must_== trade.price
+    }
   }
-
 }

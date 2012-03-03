@@ -8,8 +8,10 @@ import akka.util.duration._
 
 object PlayActorService {
 
+
   implicit val timeout = Timeout(30000)
   val duration = timeout.duration
+  // Todo use play.akka
   val system = ActorSystem("SvenskaBitcoinSystem")
   val userService: UserService = InMemoryUserService()
   val tradeService = InMemoryTradeService[BTC, SEK]()
@@ -27,7 +29,7 @@ object PlayActorService {
   }
 
   def getUserByEmail(email: Email): Option[User] = {
-    userService.findByEmail(email)
+    userService.findByEmail(email).map(updateBalance(_)).getOrElse(return None)
   }
 
   def getUserActor(userId: UserId): ActorRef = {
@@ -51,12 +53,18 @@ object PlayActorService {
     })
   }
 
+  def updateBalance(user: User): Option[User] = {
+    val balance = tradeService.sumByUser(user.userId)
+    log.debug("Sum of trades are {}", balance)
+    Some(user.copy(balance = balance))
+  }
+
+  // Todo remove
   def getUserInSession(implicit request: Request[AnyContent]): Option[User] = {
     val email = request.session.get("email").getOrElse(return None)
     val user = userService.findByEmail(Email(email)).getOrElse(return None)
     log.debug("Found user {} in session", user)
-    val balance = tradeService.sumByUser(user.userId)
-    Some(user.copy(balance = balance))
+    updateBalance(user)
   }
 
   def getUserActorInSession(implicit request: Request[AnyContent]): Option[ActorRef] = {
@@ -68,4 +76,7 @@ object PlayActorService {
     userService.create(name, email, password)
   }
 
+  def getTrades(user: User): List[Trade[BTC, SEK]] = tradeService.getTrades(user.userId)
+
+  def getUserTrades(user:User):List[UserTrade[BTC,SEK]] = getTrades(user) map (_.toUserTrade(user.userId))
 }

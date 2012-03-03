@@ -1,0 +1,7 @@
+@(user: Option[User], trades:List[UserTrade[BTC,SEK]])
+@main(user=user) {
+   <table>
+       <tr><th>Datum</th><th>Antal</th><th>Pris</th><th>Totalt</th></tr>
+       @trades.map { trade =>  @views.html.trade(trade) }
+   </table>
+}

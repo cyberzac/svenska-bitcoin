@@ -23,6 +23,7 @@ GET    /ask                     controllers.Application.ask
 GET    /bid                     controllers.Application.bid
 GET    /userOrders        controllers.Application.userOrders
 GET    /orders               controllers.Application.orders
+GET    /trades                controllers.Application.trades
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file         controllers.Assets.at(path="/public", file)

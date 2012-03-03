@@ -24,8 +24,6 @@ object Application extends Controller with Secured {
       }.getOrElse(Forbidden)
   }
 
-
-
   val orderForm = Form(
     tuple(
       "amount" -> text,
@@ -77,7 +75,20 @@ object Application extends Controller with Secured {
       }.getOrElse(Forbidden)
   }
 
+
   /**
+   * List all trades
+   */
+  def trades = IsAuthenticated {
+    username => implicit request =>
+      PlayActorService.getUserByEmail(Email(username)).map {
+        user =>
+          val trades = PlayActorService.getUserTrades(user)
+          Ok(html.trades(Some(user), trades))
+      }.getOrElse(Forbidden)
+  }
+
+/**
    * List all active orders for a user
    * @return
    */

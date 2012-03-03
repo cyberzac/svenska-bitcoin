@@ -2,7 +2,6 @@ package models
 
 import org.specs2.mutable.Specification
 
-// Todo check if this is still valid
 class InMemoryUserServiceSpec extends Specification {
 
   "inMemoryUserService" should {

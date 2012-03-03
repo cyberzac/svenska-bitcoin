@@ -10,6 +10,11 @@ object InMemoryTradeService {
 }
 
 class InMemoryTradeService[A <: Currency[A], P <: Currency[P]] extends TradeService[A, P] {
+
+  def getTrades(userId: UserId): List[Trade[A, P]] = trades filter { trade =>
+    trade.sellerId == userId || trade.buyerId == userId
+  }
+
   var trades = List[Trade[A, P]]()
 
   val log = LoggerFactory.getLogger(this.getClass)

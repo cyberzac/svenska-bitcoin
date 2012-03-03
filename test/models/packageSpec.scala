@@ -1,4 +1,5 @@
-import models._
+package models
+
 import org.specs2.mutable.Specification
 
 class packageSpec extends Specification {
