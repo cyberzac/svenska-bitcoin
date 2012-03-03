@@ -9,7 +9,7 @@ GET     /bitcoin                controllers.NotLoggedIn.bitcoin
 # Authentication
 GET     /login                  controllers.NotLoggedIn.login
 POST    /login                  controllers.NotLoggedIn.authenticate
-GET     /register               controllers.NotLoggedIn.register
+GET     /register              controllers.NotLoggedIn.register
 POST   /register              controllers.NotLoggedIn.registerUser
 #
 # Logged in

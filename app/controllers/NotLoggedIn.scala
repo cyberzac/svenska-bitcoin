@@ -74,7 +74,7 @@ object NotLoggedIn extends Controller {
       loginForm.bindFromRequest.fold(
         formWithErrors => BadRequest(html.login(formWithErrors)),
         form => {
-          Redirect(routes.Application.home()).withSession("email" -> form._1)
+          Redirect(routes.Application.home).withSession("email" -> form._1)
         }
       )
   }
@@ -88,7 +88,7 @@ object NotLoggedIn extends Controller {
   }
 
   /**
-   * Handle login form submission.
+   * Handle register form submission.
    */
   def registerUser = Action {
     implicit request =>
@@ -96,7 +96,7 @@ object NotLoggedIn extends Controller {
       formWithErrors => BadRequest(html.register(formWithErrors)), {
         case (email, password, password2) =>
           Logger.info("Registering user %s, password %s".format(email, password))
-          Redirect(routes.Application.home()).withSession("email" -> email)
+          Redirect(routes.Application.home).withSession("email" -> email)
       }
       )
   }

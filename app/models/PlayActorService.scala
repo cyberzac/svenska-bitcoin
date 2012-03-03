@@ -21,7 +21,13 @@ object PlayActorService {
   var userActors = Map[Email, ActorRef]()
 
   def authenticate(email: Email, password: String): Boolean = {
-    userService.findByEmail(email).isDefined
+    userService.findByEmail(email).map { user =>
+    user.password.equals(password)
+    }.getOrElse(false)
+  }
+
+  def getUserByEmail(email: Email): Option[User] = {
+    userService.findByEmail(email)
   }
 
   def getUserActor(userId: UserId): ActorRef = {
