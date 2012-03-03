@@ -14,7 +14,7 @@ class InMemoryUserService(var userId: Int) extends UserService {
   val log = LoggerFactory.getLogger(getClass)
   var users = Map[UserId, User]()
 
-  def empty() = {
+  def empty() {
     users = users.empty
   }
 
@@ -46,7 +46,7 @@ class InMemoryUserService(var userId: Int) extends UserService {
   def create(name: Name, email: Email, clear: String): User = {
     if (findByEmail(email).isDefined) throw new IllegalArgumentException("%s is already in use".format(email))
     userId += 1
-    val user = User(name, email, userId.toString, Password(clear))
+    val user = User(name, email, UserId(userId.toString), Password(clear))
     users = users + (user.userId -> user)
     log.info("Created user {}", user)
     user

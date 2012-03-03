@@ -1,5 +1,7 @@
 package models
 
+import org.slf4j.LoggerFactory
+
 
 object InMemoryTradeService {
   def apply[A <: Currency[A], P <: Currency[P]]() = {
@@ -10,13 +12,16 @@ object InMemoryTradeService {
 class InMemoryTradeService[A <: Currency[A], P <: Currency[P]] extends TradeService[A, P] {
   var trades = List[Trade[A, P]]()
 
-  def store(trade: Trade[A, P]) = {
+  val log = LoggerFactory.getLogger(this.getClass)
+
+  def store(trade: Trade[A, P]) {
+    log.info("Stored trade {}", trade)
     trades = trade :: trades
   }
 
   def sumByUser(userId: UserId): Balance = {
     if (trades isEmpty) return Balance()
-    trades.foldLeft(Balance()) {
+    val balance = trades.foldLeft(Balance()) {
       (b, trade) => {
         trade match {
           case Trade(time, tradeId, a: BTC, price: SEK, `userId`, `userId`) => b
@@ -26,6 +31,8 @@ class InMemoryTradeService[A <: Currency[A], P <: Currency[P]] extends TradeServ
         }
       }
     }
+    log.debug("UserId {} balanace is {}", userId, balance)
+    balance
   }
 }
 

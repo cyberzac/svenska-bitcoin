@@ -10,8 +10,6 @@ import java.util.UUID
 import models._
 import akka.actor.{Props, ActorSystem}
 import akka.pattern.ask
-import akka.util.duration._
-import akka.util.Timeout
 import akka.dispatch.Await
 
 object Application extends Controller with Secured {
@@ -83,11 +81,6 @@ object Application extends Controller with Secured {
   }
 
 
-  val system = ActorSystem("SvenskaBitcoinSystem")
-  implicit val timeout = Timeout(30 seconds)
-
-  val orderBookActor = system.actorOf(Props[OrderBookActor[BTC, SEK]], "orderBook")
-
   val orderForm = Form(
     tuple(
       "amount" -> text,
@@ -108,7 +101,7 @@ object Application extends Controller with Secured {
           val amount = BigDecimal(amountStr)
           val price = BigDecimal(priceStr)
           val order = BidOrderSEK(BTC(amount), SEK(price), user.userId)
-          orderBookActor ! order
+          PlayActorService.orderBookActor ! order
           Redirect("userOrders")
         }
       }
@@ -128,7 +121,7 @@ object Application extends Controller with Secured {
           val amount = BigDecimal(amountStr)
           val price = BigDecimal(priceStr)
           val order = AskOrderSEK(BTC(amount), SEK(price), user.userId)
-          orderBookActor ! order
+          PlayActorService.orderBookActor ! order
           Redirect("userOrders")
         }
       }
@@ -144,8 +137,9 @@ object Application extends Controller with Secured {
       val user = PlayActorService.getUserInSession
       if (user.isDefined) {
         val userId = user.get.userId
-        val future = akka.pattern.ask(orderBookActor, ListOrders(userId)).mapTo[Orders[BTC, SEK]]
-        val orders = Await.result(future, timeout.duration)
+        implicit val timeout = PlayActorService.timeout
+        val future = akka.pattern.ask(PlayActorService.orderBookActor, ListOrders(userId)).mapTo[Orders[BTC, SEK]]
+        val orders = Await.result(future, PlayActorService.duration)
         Ok(html.userorders(user, orders.askOrders, orders.bidOrders))
       } else {
         Unauthorized
@@ -158,10 +152,11 @@ object Application extends Controller with Secured {
    */
   def orders = Action {
     implicit request =>
-      val future = (orderBookActor ? ListOrders).mapTo[Orders[BTC, SEK]]
-      val orders = Await.result(future, timeout.duration)
-      val user = PlayActorService.getUserInSession
-      Ok(html.userorders(user, orders.askOrders, orders.bidOrders))
+    implicit val timeout = PlayActorService.timeout
+    val future = (PlayActorService.orderBookActor ? ListOrders).mapTo[Orders[BTC, SEK]]
+    val orders = Await.result(future, PlayActorService.duration)
+    val user = PlayActorService.getUserInSession
+    Ok(html.userorders(user, orders.askOrders, orders.bidOrders))
   }
 
   /**
