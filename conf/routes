@@ -16,13 +16,6 @@ POST   /register              controllers.NotLoggedIn.registerUser
 #
 # Home
 GET     /home                  controllers.Application.home
-
-# Buy
-GET     /buy                     controllers.Application.buy
-
-#Sell
-GET     /sell                     controllers.Application.sell
-
 GET     /logout                controllers.Application.logout
 
 # OrderBook

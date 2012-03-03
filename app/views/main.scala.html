@@ -9,8 +9,8 @@
     </head>
     <body>
         <header>
-            <a href="@routes.Application.home" id="logo">@title</a>
             @if(user.isDefined) {
+            <a href="@routes.Application.home" id="logo">@title</a>
             <dl id="user">
                 <dt>@user.get.name.value <span>(@user.get.email.value)</span></dt>
                 <dt>@user.get.balance.sek.value SEK</dt>
@@ -19,14 +19,14 @@
                     <a href="@routes.Application.logout()">Logout</a>
                 </dd>
             </dl>
+            } else {
+            <a href="@routes.NotLoggedIn.index" id="logo">@title</a>
             }
         </header>
 
         <nav>
             <section>
             <ul>
-                <li><a href="buy">Direktk&ouml;p</a></li>
-                <li><a href="sell">Direktf&ouml;rs&auml;ljning</a></li>
                 @if(user.isDefined) {
                     <li><a href="bid">K&ouml;porder</a></li>
                     <li><a href="ask">S&auml;ljorder</a></li>

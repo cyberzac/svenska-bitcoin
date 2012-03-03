@@ -11,25 +11,7 @@ import models._
 import akka.pattern.ask
 import akka.dispatch.Await
 
-// Todo login does not work, you're password is disregarded
 object Application extends Controller with Secured {
-
-  val buyForm = Form(
-    tuple(
-      "amount" -> text,
-      "address" -> text
-    )
-  )
-
-  val sellForm = Form(
-    tuple(
-      "amount" -> text,
-      "bank" -> text,
-      "account" -> text
-    )
-  )
-
-  // -- Actions
 
   /**
    * Home page
@@ -42,47 +24,6 @@ object Application extends Controller with Secured {
       }.getOrElse(Forbidden)
   }
 
-  /**
-   * Direct buy
-   * @return
-   */
-  def buy = IsAuthenticated {
-    username => implicit request =>
-      PlayActorService.getUserByEmail(Email(username)).map {
-        user =>
-          buyForm.bindFromRequest.fold(
-          // Todo change view  buy to use User instead of Option[User]
-          formWithErrors => BadRequest(html.buy(Some(user), formWithErrors)), {
-            case (amount, address) => {
-              val reference = UUID.randomUUID().hashCode().toHexString
-              Logger.info("Buy %s: %s SEK -> %s, %s".format(user.email.value, amount, address, reference))
-              Ok(html.pay(amount, address, reference))
-            }
-          }
-          )
-      }.getOrElse(Forbidden)
-  }
-
-  /**
-   * Direct sell
-   * @return
-   */
-  def sell = IsAuthenticated {
-    username => implicit request =>
-      PlayActorService.getUserByEmail(Email(username)).map {
-        user =>
-          sellForm.bindFromRequest.fold(
-          // Todo change view  buy to use User instead of Option[User]
-          formWithErrors => BadRequest(html.sell(Some(user), formWithErrors)), {
-            case (amount, bank, account) => {
-              val address = "1x17"
-              Logger.info("Sell %s: %s BTC -> %s, %s:%s".format(user.email.value, amount, address, bank, account))
-              Ok(html.receive(amount, address, bank, account))
-            }
-          }
-          )
-      }.getOrElse(Forbidden)
-  }
 
 
   val orderForm = Form(
@@ -93,7 +34,7 @@ object Application extends Controller with Secured {
   )
 
   /**
-   * PLace a bid order
+   * Place a bid order
    * @return
    */
   def bid = IsAuthenticated {
