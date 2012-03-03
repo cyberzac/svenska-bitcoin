@@ -2,10 +2,11 @@ package controllers
 
 import play.api.mvc._
 import play.api.data._
+import play.api.data.Forms._
 import play.Logger
 
 import views._
-import models.PlayUserService
+import models._
 
 object NotLoggedIn extends Controller {
 
@@ -14,28 +15,28 @@ object NotLoggedIn extends Controller {
    */
   def index = Action {
     request => {
-      val user = PlayUserService.getUserInSession(request)
+      val user = PlayActorService.getUserInSession(request)
       Ok(html.index(user))
     }
   }
 
   def about = Action {
     request => {
-      val user = PlayUserService.getUserInSession(request)
+      val user = PlayActorService.getUserInSession(request)
       Ok(html.about(user))
     }
   }
 
   def bitcoin = Action {
     request => {
-      val user = PlayUserService.getUserInSession(request)
+      val user = PlayActorService.getUserInSession(request)
       Ok(html.bitcoin(user))
     }
   }
 
 
   val registerForm = Form(
-    of(
+    tuple(
       "email" -> text,
       "password" -> text,
       "password2" -> text
@@ -46,13 +47,13 @@ object NotLoggedIn extends Controller {
 
   // -- Authentication
   val loginForm = Form(
-    of(
+    tuple(
       "email" -> text,
       "password" -> text
     ) verifying("Felaktig inlogging", result => result match {
       case (email, password) => {
         Logger.debug("login %s:%s".format(email, password))
-        PlayUserService.getUserActor(email, password).isDefined
+        PlayActorService.authenticate(email, password)
       }
     })
   )
@@ -104,17 +105,24 @@ object NotLoggedIn extends Controller {
 /**
  * Provide security features
  */
-trait Secured extends Security.AllAuthenticated {
+trait Secured {
 
   /**
    * Retrieve the connected user email.
    */
-  override def username(request: RequestHeader) = request.session.get("email")
+   def username(request: RequestHeader) = request.session.get("email")
+
+  /**
+   * Action for authenticated users.
+   */
+  def IsAuthenticated(f: => String => Request[AnyContent] => Result) = Security.Authenticated(username, onUnauthorized) { user =>
+    Action(request => f(user)(request))
+  }
 
   /**
    * Redirect to login if the use in not authorized.
    */
-  override def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.NotLoggedIn.login())
+   def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.NotLoggedIn.login())
 
 }
 

@@ -1,8 +1,8 @@
-@(user: org.bitcex.model.User)
+@(user: User)
 @main(user=Some(user)) {
    <table>
        <tr><th>Valuta</th><th>Saldo</th></tr>
-       <tr><td>SEK</td><td>@user.sek.amount</td></tr>
-       <tr><td>BTC</td><td>@user.btc.amount</td></tr>
+       <tr><td>SEK</td><td>@user.balance.sek.value</td></tr>
+       <tr><td>BTC</td><td>@user.balance.btc.value</td></tr>
    </table>
 }

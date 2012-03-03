@@ -2,23 +2,29 @@ package controllers
 
 import play.api.mvc._
 import play.api.data._
+import play.api.data.Forms._
 import play.Logger
 
 import views._
-import models.PlayUserService
 import java.util.UUID
+import models._
+import akka.actor.{Props, ActorSystem}
+import akka.pattern.ask
+import akka.util.duration._
+import akka.util.Timeout
+import akka.dispatch.Await
 
 object Application extends Controller with Secured {
 
   val buyForm = Form(
-    of(
+    tuple(
       "amount" -> text,
       "address" -> text
     )
   )
 
   val sellForm = Form(
-    of(
+    tuple(
       "amount" -> text,
       "bank" -> text,
       "account" -> text
@@ -32,7 +38,7 @@ object Application extends Controller with Secured {
    */
   def home = Action {
     implicit request =>
-      val user = PlayUserService.getUserInSession(request)
+      val user = PlayActorService.getUserInSession(request)
       if (user.isDefined) {
         Ok(html.home(user.get))
       } else {
@@ -40,9 +46,13 @@ object Application extends Controller with Secured {
       }
   }
 
+  /**
+   * Direct buy
+   * @return
+   */
   def buy = Action {
     implicit request =>
-      val user = PlayUserService.getUserInSession(request)
+      val user = PlayActorService.getUserInSession(request)
       buyForm.bindFromRequest.fold(
       formWithErrors => BadRequest(html.buy(user, formWithErrors)), {
         case (amount, address) => {
@@ -54,9 +64,13 @@ object Application extends Controller with Secured {
       )
   }
 
+  /**
+   * Direct sell
+   * @return
+   */
   def sell = Action {
     implicit request =>
-      val user = PlayUserService.getUserInSession(request)
+      val user = PlayActorService.getUserInSession(request)
       sellForm.bindFromRequest.fold(
       formWithErrors => BadRequest(html.sell(user, formWithErrors)), {
         case (amount, bank, account) => {
@@ -66,6 +80,88 @@ object Application extends Controller with Secured {
         }
       }
       )
+  }
+
+
+  val system = ActorSystem("SvenskaBitcoinSystem")
+  implicit val timeout = Timeout(30 seconds)
+
+  val orderBookActor = system.actorOf(Props[OrderBookActor[BTC, SEK]], "orderBook")
+
+  val orderForm = Form(
+    tuple(
+      "amount" -> text,
+      "price" -> text
+    )
+  )
+
+  /**
+   * PLace a bid order
+   * @return
+   */
+  def bid = Action {
+    implicit request =>
+      val user = PlayActorService.getUserInSession.get
+      orderForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(html.bid(user, formWithErrors)), {
+        case (amountStr, priceStr) => {
+          val amount = BigDecimal(amountStr)
+          val price = BigDecimal(priceStr)
+          val order = BidOrderSEK(BTC(amount), SEK(price), user.userId)
+          orderBookActor ! order
+          Redirect("userOrders")
+        }
+      }
+      )
+  }
+
+  /**
+   * Place a ask order
+   * @return
+   */
+  def ask = Action {
+    implicit request =>
+      val user = PlayActorService.getUserInSession.get
+      orderForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(html.ask(user, formWithErrors)), {
+        case (amountStr, priceStr) => {
+          val amount = BigDecimal(amountStr)
+          val price = BigDecimal(priceStr)
+          val order = AskOrderSEK(BTC(amount), SEK(price), user.userId)
+          orderBookActor ! order
+          Redirect("userOrders")
+        }
+      }
+      )
+  }
+
+  /**
+   * List all active orders for a user
+   * @return
+   */
+  def userOrders = Action {
+    implicit request =>
+      val user = PlayActorService.getUserInSession
+      if (user.isDefined) {
+        val userId = user.get.userId
+        val future = akka.pattern.ask(orderBookActor, ListOrders(userId)).mapTo[Orders[BTC, SEK]]
+        val orders = Await.result(future, timeout.duration)
+        Ok(html.userorders(user, orders.askOrders, orders.bidOrders))
+      } else {
+        Unauthorized
+      }
+  }
+
+  /**
+   * List all active orders in the order book.
+   * @return
+   */
+  def orders = Action {
+    implicit request =>
+      val future = (orderBookActor ? ListOrders).mapTo[Orders[BTC, SEK]]
+      val orders = Await.result(future, timeout.duration)
+      val user = PlayActorService.getUserInSession
+      Ok(html.userorders(user, orders.askOrders, orders.bidOrders))
   }
 
   /**

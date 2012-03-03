@@ -1,11 +1,11 @@
-@(orderType:String, order:org.bitcex.model.Order[org.bitcex.model.BTC, org.bitcex.model.SEK])
+@(orderType:String, order:Order[BTC, SEK], user: Option[User])
 
 <tr>
-     <td>@orderType</td>
+    <td>@orderType</td>
     <td>@order.dateTime</td>
     <td>@order.amount</td>
     <td>@order.price</td>
-</tr>
+ </tr>
 
 
 

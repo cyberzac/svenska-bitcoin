@@ -1,4 +1,4 @@
-@(user:org.bitcex.model.User, askForm: Form[(String,String)])
+@(user:User, askForm: Form[(String,String)])
 @import helper._
 @main(user=Some(user)){
 
@@ -6,7 +6,7 @@
   S&auml;ljorder
 </p>
 
-   @form(action = routes.PlayOrderBook.ask, args = 'id -> "ask") {
+   @form(action = routes.Application.ask, args = 'id -> "ask") {
        @inputText(
            field = askForm("amount"),
            args = 'label -> "Belopp i BTC"

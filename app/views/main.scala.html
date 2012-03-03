@@ -1,4 +1,4 @@
-@(title: String = "Svenska Bitcoin", user:Option[org.bitcex.model.User] = None )(content: Html)
+@(title: String = "Svenska Bitcoin", user:Option[User] = None )(content: Html)
 <!DOCTYPE html>
 <html lang="sv">
     <head>
@@ -13,6 +13,8 @@
             @if(user.isDefined) {
             <dl id="user">
                 <dt>@user.get.name.value <span>(@user.get.email.value)</span></dt>
+                <dt>@user.get.balance.sek.value SEK</dt>
+                <dt>@user.get.balance.btc.value BTC</dt>
                 <dd>
                     <a href="@routes.Application.logout()">Logout</a>
                 </dd>
@@ -29,10 +31,11 @@
                     <li><a href="bid">K&ouml;porder</a></li>
                     <li><a href="ask">S&auml;ljorder</a></li>
                     <li><a href="@routes.Application.home()">Saldo</a></li>
-                    <li><a href="@routes.PlayOrderBook.userOrders()">Order</a></li>
+                    <li><a href="@routes.Application.userOrders()">Mina order</a></li>
                 } else {
                     <li><a href="login">Logga in</a></li>
                 }
+                <li><a href="@routes.Application.orders()">Order</a></li>
                 <li><a href="about">Om oss</a></li>
                 <li><a href="bitcoin">Om Bitcoin</a><li>
             </ul>
