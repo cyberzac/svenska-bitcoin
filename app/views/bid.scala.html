@@ -5,7 +5,7 @@
       K&ouml;porder.
     </p>
 
-    @form(action = routes.Application.bid, args = 'id -> "buy") {
+    @form(action = routes.Application.placeBidOrder, args = 'id -> "buy") {
     @inputText(
     field = bidForm("amount"),
     args = 'label -> "Belopp BTC"

@@ -6,17 +6,16 @@
   S&auml;ljorder
 </p>
 
-   @form(action = routes.Application.ask, args = 'id -> "ask") {
+   @form(action = routes.Application.placeAskOrder, args = 'id -> "ask") {
        @inputText(
            field = askForm("amount"),
            args = 'label -> "Belopp i BTC"
        )
 
-    @inputText(
+      @inputText(
         field = askForm("price"),
         args = 'label -> "Pris SEK/BTC"
-    )
-
+      )
 
    <p class="buttons">
         <input type="submit" value="S&auml;lj">

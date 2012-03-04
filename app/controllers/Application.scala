@@ -32,10 +32,20 @@ object Application extends Controller with Secured {
   )
 
   /**
+   * Display a bid order form
+   */
+  def bidOrder = IsAuthenticated {
+    username => implicit request =>
+      PlayActorService.getUserByEmail(Email(username)).map {
+        user => Ok(html.bid(user, orderForm))
+      }.getOrElse(Forbidden)
+  }
+
+  /**
    * Place a bid order
    * @return
    */
-  def bid = IsAuthenticated {
+  def placeBidOrder = IsAuthenticated {
     username => implicit request =>
       PlayActorService.getUserByEmail(Email(username)).map {
         user =>
@@ -46,7 +56,7 @@ object Application extends Controller with Secured {
               val price = BigDecimal(priceStr)
               val order = BidOrderSEK(BTC(amount), SEK(price), user.userId)
               PlayActorService.orderBookActor ! order
-              Redirect("userOrders")
+              Redirect("/order")
             }
           }
           )
@@ -54,10 +64,20 @@ object Application extends Controller with Secured {
   }
 
   /**
+   * Display  ask order form
+   */
+  def askOrder = IsAuthenticated {
+    username => implicit request =>
+      PlayActorService.getUserByEmail(Email(username)).map {
+        user => Ok(html.ask(user, orderForm))
+      }.getOrElse(Forbidden)
+  }
+
+  /**
    * Place a ask order
    * @return
    */
-  def ask = IsAuthenticated {
+  def placeAskOrder = IsAuthenticated {
     username => implicit request =>
       PlayActorService.getUserByEmail(Email(username)).map {
         user =>
@@ -68,7 +88,7 @@ object Application extends Controller with Secured {
               val price = BigDecimal(priceStr)
               val order = AskOrderSEK(BTC(amount), SEK(price), user.userId)
               PlayActorService.orderBookActor ! order
-              Redirect("userOrders")
+              Redirect("/order")
             }
           }
           )

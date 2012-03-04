@@ -28,11 +28,11 @@
             <section>
             <ul>
                 @if(user.isDefined) {
-                    <li><a href="bid">K&ouml;porder</a></li>
-                    <li><a href="ask">S&auml;ljorder</a></li>
-                    <li><a href="@routes.Application.home()">Saldo</a></li>
-                    <li><a href="@routes.Application.userOrders()">Mina order</a></li>
-                    <li><a href="@routes.Application.trades()">Avslut</a></li>
+                    <li><a href="@routes.Application.bidOrder">K&ouml;porder</a></li>
+                    <li><a href="@routes.Application.askOrder">S&auml;ljorder</a></li>
+                    <li><a href="@routes.Application.home">Saldo</a></li>
+                    <li><a href="@routes.Application.userOrders">Mina order</a></li>
+                    <li><a href="@routes.Application.trades">Avslut</a></li>
                 } else {
                     <li><a href="login">Logga in</a></li>
                 }

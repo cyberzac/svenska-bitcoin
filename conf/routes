@@ -19,11 +19,13 @@ GET     /home                  controllers.Application.home
 GET     /logout                controllers.Application.logout
 
 # OrderBook
-GET    /ask                     controllers.Application.ask
-GET    /bid                     controllers.Application.bid
-GET    /userOrders        controllers.Application.userOrders
-GET    /orders               controllers.Application.orders
-GET    /trades                controllers.Application.trades
+GET    /order/ask         controllers.Application.askOrder
+POST   /order/ask         controllers.Application.placeAskOrder
+GET    /order/bid         controllers.Application.bidOrder
+POST   /order/bid         controllers.Application.placeBidOrder
+GET    /order                 controllers.Application.userOrders
+GET    /order/all           controllers.Application.orders
+GET    /trade                 controllers.Application.trades
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file         controllers.Assets.at(path="/public", file)
