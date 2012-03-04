@@ -1,11 +1,10 @@
 @(orderType:String, order:Order[BTC, SEK], user: Option[User])
-
 <tr>
     <td>@orderType</td>
-    <td>@order.dateTime</td>
-    <td>@order.amount</td>
-    <td>@order.price</td>
-    <td>@order.total</td>
+    <td>@order.dateTime.toString("YYYY-MM-DD HH:MM:SS")</td>
+    <td>@order.amount.value</td>
+    <td>@order.price.value</td>
+    <td>@order.total.value</td>
  </tr>
 
 

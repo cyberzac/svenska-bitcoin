@@ -1,7 +1,7 @@
 @(user: Option[User], asks: List[AskOrder[BTC,SEK]], bids:List[BidOrder[BTC,SEK]])
 @main(user=user) {
    <table>
-       <tr><th>Typ</th><th>Datum</th><th>Antal</th><th>Pris</th><th>Totalt</th></tr>
+       <tr><th>Typ</th><th>Datum</th><th>BTC</th><th>Pris</th><th>Totalt</th></tr>
        @asks.reverse.map { ask =>  @views.html.order("Sälj", ask, user) }
        @bids.map { bid =>  @views.html.order("Köp", bid, user) }
    </table>

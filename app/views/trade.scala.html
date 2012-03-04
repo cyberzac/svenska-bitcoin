@@ -1,10 +1,10 @@
 @(trade:UserTrade[BTC, SEK])
 
 <tr>
-    <td>@trade.dateTime</td>
-    <td>@trade.amount</td>
-    <td>@trade.price</td>
-    <td>@trade.total</td>
+    <td>@trade.dateTime.toString("YYYY-MM-DD HH:MM:SS")</td>
+    <td>@trade.amount.value</td>
+    <td>@trade.price.value</td>
+    <td>@trade.total.value</td>
  </tr>
 
 
