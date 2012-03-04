@@ -24,6 +24,7 @@ class TradeSpec extends Specification {
       userTrade.time must_== trade.time
       userTrade.amount must_== trade.amount
       userTrade.price must_== -trade.price
+      userTrade.total must_== -trade.price * trade.amount.value
     }
 
     "Create a UserTrade when seller" in {
@@ -31,6 +32,7 @@ class TradeSpec extends Specification {
       userTrade.time must_== trade.time
       userTrade.amount must_== -trade.amount
       userTrade.price must_== trade.price
+      userTrade.total must_== trade.price * trade.amount.value
     }
   }
 }

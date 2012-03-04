@@ -33,7 +33,7 @@ object UserTrade {
 
 case class UserTrade[A <: Currency[A], P <: Currency[P]](time: Long, id: TradeId, amount: A, price: P, userId:UserId) {
   def dateTime: DateTime = new DateTime(time)
-  val total = price * amount.value
+  val total = price * amount.value.abs
 }
 
 object TradeId {
