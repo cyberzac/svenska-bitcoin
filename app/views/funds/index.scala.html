@@ -1,0 +1,11 @@
+@(user: User)
+@import helper._
+@main(user=Some(user)) {
+    <p>
+   Du kan överföra kronor och bitcoin till och från ditt konto hos Svenska Bitcoin
+        <ul>
+            <li><a href="@routes.Funds.add">Sätta in</a></li>
+            <li><a href="@routes.Funds.withdraw">Ta ut</a></li>
+        </ul>
+    </p>
+}

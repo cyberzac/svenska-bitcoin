@@ -1,0 +1,8 @@
+@(user: User)
+@import helper._
+@main(user=Some(user)) {
+    <p>
+      Sätta in pengar på ditt konto hos Svenska Bitcoin.<br/>
+      Sätt in valfritt belopp på SEB 5694 02 486 33 och ange referensnummer @user.userId.value
+    </p>
+}
