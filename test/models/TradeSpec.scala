@@ -1,6 +1,7 @@
 package models
 
 import org.specs2.mutable.Specification
+import org.joda.time.DateTime
 
 class TradeSpec extends Specification {
 
@@ -11,28 +12,20 @@ class TradeSpec extends Specification {
 
   "A Trade " should {
 
-    val trade = Trade(askOrder, bidOrder, SEK(45))
+    val trade = Trade(askOrder, bidOrder, SEK(40))
     "Be created from orders with correct amount" in {
       trade.amount must_== BTC(6)
     }
     "Be created from orders with correct price" in {
-      trade.price must_== SEK(45)
+      trade.price must_== SEK(40)
     }
 
-    "Create a UserTrade when buyer" in {
-      val userTrade = trade.toUserTrade(buyer)
-      userTrade.time must_== trade.time
-      userTrade.amount must_== trade.amount
-      userTrade.price must_== -trade.price
-      userTrade.total must_== -trade.price * trade.amount.value
+    "Have a dateTime member" in {
+      trade.dateTime must_== new DateTime(trade.time)
     }
 
-    "Create a UserTrade when seller" in {
-      val userTrade = trade.toUserTrade(seller)
-      userTrade.time must_== trade.time
-      userTrade.amount must_== -trade.amount
-      userTrade.price must_== trade.price
-      userTrade.total must_== trade.price * trade.amount.value
+    "Have a total" in {
+      trade.total must_== SEK(240)
     }
   }
 }

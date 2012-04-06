@@ -20,7 +20,7 @@ object ApplicationBuild extends Build {
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
 
-    libraryDependencies += "com.typesafe.akka" % "akka-testkit" % "2.0-RC1"
+    libraryDependencies += "com.typesafe.akka" % "akka-testkit" % "2.0"
     // Add your own project settings here
   )
 

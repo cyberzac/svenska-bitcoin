@@ -78,5 +78,5 @@ object PlayActorService {
 
   def getTrades(user: User): List[Trade[BTC, SEK]] = tradeService.getTrades(user.userId)
 
-  def getUserTrades(user:User):List[UserTrade[BTC,SEK]] = getTrades(user) map (_.toUserTrade(user.userId))
+  def getUserTransactions(user:User):List[Transaction] = null
 }

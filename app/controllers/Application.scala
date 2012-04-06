@@ -103,7 +103,7 @@ object Application extends Controller with Secured {
     username => implicit request =>
       PlayActorService.getUserByEmail(Email(username)).map {
         user =>
-          val trades = PlayActorService.getUserTrades(user)
+          val trades = PlayActorService.getTrades(user)
           Ok(html.trades(Some(user), trades))
       }.getOrElse(Forbidden)
   }
