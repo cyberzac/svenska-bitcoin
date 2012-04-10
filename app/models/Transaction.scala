@@ -1,37 +1,57 @@
 package models
 
 import org.joda.time.DateTime
-import java.util.{Date}
-
-import play.api.db._
-import play.api.Play.current
+import java.util.Date
 
 import anorm._
 import anorm.SqlParser._
 
-case class Transaction(id:Pk[Long], userId:UserId, sek:SEK, btc:BTC, note:String, time:Long = System.currentTimeMillis())  {
-  def dateTime: DateTime = new DateTime(time)
-  def date: Date = dateTime.toDate
-}
+import play.api.db._
+import play.api.Play.current
+import org.slf4j.LoggerFactory
 
+// Todo add debit, credit
 /**
 Transaktionstyper:
 
-Insättning  2012-03-05 user1  (Från konto/bg/pg)        500 SEK   ref => från formulär
-Insättning  2012-03-05 user1  (Från adress)               500 BTC    ref
-Uttag         2012-03-15 user1  (Till konto/bg/pg        -500 SEK    ref?
-Uttag         2012-03-15 user1  (Till address)              -500 BTC   ref?
-Köp            2012-03-15 user1  (50 BTC á 40 SEK)   -2000 SEK   ref  => tradeId
-Sålt            2012-03-15 user1  (50 BTC á 40 SEK)    2000 SEK   ref  =>tradeId
+Insättning  2012-03-05 user1  (Från konto/bg/pg)        500 SEK   ref => kontonummer
+Insättning  2012-03-05 user1  (Från bitcoinadress)               500 BTC    ref => btcadress
+Uttag         2012-03-15 user1  (Till konto/bg/pg        -500 SEK    ref => kontonummer
+Uttag         2012-03-15 user1  (Till bitcoinaddress)              -500 BTC   ref => btcadress
+Köp            2012-03-15 user1  (50 BTC á 40 SEK)   -2000 reserved SEK,  50 BTC   ref  => tradeId
+Sålt            2012-03-15 user1  (50 BTC á 40 SEK)    2000 SEK , -50 reserved BTC   ref  =>tradeId
 Courtage     2012-03-15 user1  (0.5% av 2000 BTC)    -10 BTC    ref =>tradeId
+ReservationKöp 2012-04-06 user1 (2000 SEK => Reserved SEK)  ref => OrderId
+ReservationSälj 2012-04-06 user1 (50 BTC => Reserved BTC)  ref => OrderId
+
+ Saldon:
+
+ SEK
+ reservedSEK
+ BTC
+ reservedBTC
+
+ id, date, user, debit_account, debit,  credit_account, credit, type, note
+
  */
+case class Transaction(id: Option[Pk[Long]], debit: Debit, credit: Credit, note: String, time: Long = System.currentTimeMillis()) {
+  def dateTime: DateTime = new DateTime(time)
+
+  def date: Date = dateTime.toDate
+}
+
+
 object Transaction {
- /* def apply[A <: Currency[A], P <: Currency[P]](trade:Trade[A, P], userId:UserId):Transaction[A, P] = {
-    trade match {
-      case Trade(time, tid, amount:A, price:P, `userId`, buyer) => new Transaction(time, tid, -amount, price, userId)
-      case Trade(time, tid, amount, price, seller, `userId`) => new Transaction(time, tid, amount, -price, userId)
-    }
-  }  */
+
+  /* def apply[A <: Currency[A], P <: Currency[P]](trade:Trade[A, P], userId:UserId):Transaction[A, P] = {
+  trade match {
+    case Trade(time, tid, amount:A, price:P, `userId`, buyer) => new Transaction(time, tid, -amount, price, userId)
+    case Trade(time, tid, amount, price, seller, `userId`) => new Transaction(time, tid, amount, -price, userId)
+  }
+}  */
+
+  val log = LoggerFactory.getLogger(this.getClass())
+  val systemUserId = UserId("0")
 
   // -- Parsers
 
@@ -39,50 +59,125 @@ object Transaction {
    * Parse a Transaction from a ResultSet
    */
   val simple = {
-      get[Pk[Long]]("trans.id") ~
-      get[String]("trans.user_id") ~
-      get[Long]("trans.sek") ~          // Todo use BigDecimal
-      get[Long]("trans.btc") ~          // Todo use BigDecimal
+    get[Pk[Long]]("trans.id") ~
+      get[java.math.BigDecimal]("trans.credit_amount") ~
+      get[Int]("trans.credit_account") ~
+      get[String]("trans.credit_user_id") ~
+      get[java.math.BigDecimal]("trans.debit_amount") ~
+      get[Int]("trans.debit_account") ~
+      get[String]("trans.debit_user_id") ~
       get[String]("trans.note") ~
       get[Date]("trans.created_date") map {
-      case id~userId~sek~btc~note~created => Transaction(
-        id, UserId(userId), SEK(sek)/1000, BTC(btc)/(1000*1000*100), note, created.getTime
-      )
+      case id ~ creditAmount ~ creditAccount ~ creditUserId ~ debitAmount ~ debitAccount ~ debitUserId ~ note ~ created => {
+        Transaction(
+          Some(id),
+          Debit(debitAmount, Account(debitAccount), debitUserId),
+          Credit(creditAmount, Account(creditAccount), creditUserId),
+          note, created.getTime
+        )
+      }
+    }
+  }
+
+  // -- Queries
+
+  def findTransaction(id: Pk[Long]): Option[Transaction] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL("select * from trans where id = {id} ").on(
+          'id -> id
+        ).as(Transaction.simple.singleOpt)
+    }
+
+  }
+
+  def findTransactions(userId: UserId): Seq[Transaction] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL("select * from trans where credit_user_id = {userId} or debit_user_id = {userId}").on(
+          'userId -> userId.value
+        ).as(Transaction.simple *)
+    }
+  }
+
+  case class BankReference(value: String)
+
+  case class CourtageReference(value: String)
+
+  case class BitcoinAddressReference(value: String)
+
+
+  /**
+   * Creates an fund transaction
+   */
+  def create(userId: UserId, sek: SEK, reference: BankReference, time: Long = System.currentTimeMillis()): Transaction = {
+    val amount = sek.value
+    val transaction = if (amount > 0) {
+      Transaction(None, Debit(amount, Bank, userId), Credit(amount, UserSek, userId), reference.value, time)
+    } else {
+      Transaction(None, Debit(-amount, UserSek, userId), Credit(-amount, Bank, userId), reference.value, time)
+    }
+    create(transaction)
+  }
+
+
+  /**
+   * Create a Transaction.
+   */
+  def create(trans: Transaction): Transaction = {
+    DB.withConnection {
+      implicit connection =>
+
+      // Get the trans id
+        val id: Long = SQL("select next value for trans_id_seq").as(scalar[Long].single)
+
+        SQL(
+          """
+            insert into trans values (
+              {id},
+              {credit_amount}, {credit_account}, {credit_user_id},
+              {debit_amount}, {debit_account}, {debit_user_id},
+              {note}, {trans_id}, {created}
+            )
+          """
+        ).on(
+          'id -> id,
+          'credit_amount -> new java.math.BigDecimal(trans.credit.amount.toString()),
+          'credit_account -> trans.credit.account.number,
+          'credit_user_id -> trans.credit.userId.value,
+          'debit_amount -> new java.math.BigDecimal(trans.debit.amount.toString()),
+          'debit_account -> trans.debit.account.number,
+          'debit_user_id -> trans.debit.userId.value,
+          'trans_id -> trans.id,
+          'created -> trans.date,
+          'note -> trans.note
+        ).executeUpdate()
+        val t = trans.copy(id = Some(Id(id)))
+        log.debug("Stored transaction {}", t)
+        t
     }
   }
 
 }
 
- /*
-case class sekFundTransaction(userId:UserId, sek:SEK, account:BankAccount, transactionId:TransactionId = TransactionId(), time:Long = System.currentTimeMillis()) extends Transaction {
-  val btc = 0
-  val note = account.toString
-}
-case class tradeTransaction(userId:UserId, sek:SEK, btc:BTC, tradeId:TradeId, transactionId:TransactionId = TransactionId(), time:Long = System.currentTimeMillis()) extends Transaction  {
-  val note = tradeId.toString
-}
-case class courtageTransaction(userId:UserId, sek:SEK, btc:BTC, tradeId:TradeId, courtage:Courtage,transactionId:TransactionId = TransactionId(), time:Long = System.currentTimeMillis()) extends Transaction {
-  val note = courtage.toString + ":" + tradeId.toString
-}
-
-case class btcFundTransaction(userId:UserId, btc:BTC, address:BitcoinAddress, transactionId:TransactionId = TransactionId(), time:Long = System.currentTimeMillis()) extends Transaction {
-  val sek = 0
-  val note = address.toString
-}
-*/
-
-
-
-
 object TransactionId {
-  var count:Long = 0
+  var count: Long = 0
+
   def apply() = {
     count += 1
     new TransactionId(count.toString)
   }
 }
-case class TransactionId(value:String)
-case class BitcoinAddress(address:String)
-case class BankAccount(account:String)
-case class Courtage(value:BigDecimal)
+
+case class TransactionId(value: String)
+
+
+//case class SekAccount(value: SEK, userId: UserId) extends DebitCredit(1, value.value, userId)
+
+//case class ReservedSekAccount(value: SEK, userId: UserId) extends DebitCredit(2, value.value, userId)
+
+//case class BtcAccount(value: BTC, userId: UserId) extends DebitCredit(3, value.value, userId)
+
+//case class ReservedBtcAccount(value: BTC, userId: UserId) extends DebitCredit(4, value.value, userId)
+
 

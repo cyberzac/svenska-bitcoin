@@ -78,5 +78,7 @@ class CurrencySpec extends Specification {
     "Have a zero method" in {
       SEK(10).zero must_== SEK(0)
     }
+
+    //"Have a serializeToLong method" in {}
   }
 }

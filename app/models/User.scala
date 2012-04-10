@@ -6,5 +6,6 @@ case class Email(value: String)
 
 case class Name(value: String)
 
+// Todo change to Int
 case class UserId(value: String)
 

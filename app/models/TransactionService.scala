@@ -1,5 +1,8 @@
 package models
 
+import models.Transaction.{CourtageReference, BankReference, BitcoinAddressReference}
+
+
 trait TransactionService {
 
   /**
@@ -19,7 +22,7 @@ trait TransactionService {
    * @param sek
    * @param bankAccount
    */
-  def create(userId:UserId, sek:SEK, bankAccount:BankAccount)
+  def create(userId:UserId, sek:SEK, bankAccount:BankReference)
 
   /**
    * Creates and stores a transaction for changes, add or withdraw of a BTC fund
@@ -27,7 +30,7 @@ trait TransactionService {
    * @param btc
    * @param bitcoinAddress
    */
-  def create(userId:UserId, btc:BTC, bitcoinAddress:BitcoinAddress)
+  def create(userId:UserId, btc:BTC, bitcoinAddress:BitcoinAddressReference)
 
   /**
    * Creates and stores a transaction for the courtage
@@ -35,7 +38,7 @@ trait TransactionService {
    * @param btc
    * @param courtage
    */
-  def create(userId:UserId, btc:BTC, courtage:Courtage)
+  def create(userId:UserId, btc:BTC, courtage:CourtageReference)
 
   /**
    * Sums all transactions for a user
