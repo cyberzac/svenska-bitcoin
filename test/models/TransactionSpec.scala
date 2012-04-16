@@ -41,18 +41,18 @@ class TransactionSpec extends Specification {
       }
     }
 
-    // Throw an IllegalArgumentExcpetion if the transaction i not balanced.
+    // Todo Throw an IllegalArgumentException if the transaction is not balanced.
 
-    /*
+
     "Find all transactions by userId" in {
       running(FakeApplication()) {
         Transaction.create(userId, sek, reference, time)
         Transaction.create(userId, -sek, reference, time)
-        val t1 = Transaction(Some(Id(1000)), Debit(100, UserSek, userId), Credit(100, Bank, userId), reference.value, time)
-        val t2 = Transaction(Some(Id(1001)), Debit(100, Bank, userId), Credit(100, UserSek, userId), reference.value, time)
+        val t1 = Transaction(Some(Id(1000)), Debit(amount, Bank, userId), Credit(amount, UserSek, userId), reference.value, time)
+        val t2 = Transaction(Some(Id(1001)), Debit(amount, UserSek, userId), Credit(amount, Bank, userId), reference.value, time)
         Transaction.findTransactions(userId) must_== Seq(t1, t2)
       }
-    }*/
+    }
 
     "have a dateTime" in {
       val transaction = Transaction(Some(Id(1000)), Debit(100, Bank, userId), Credit(100, UserBitcoin, userId), reference.value, time)
