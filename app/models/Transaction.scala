@@ -34,7 +34,7 @@ ReservationSälj 2012-04-06 user1 (50 BTC => Reserved BTC)  ref => OrderId
  id, date, user, debit_account, debit,  credit_account, credit, type, note
 
  */
-case class Transaction(id: Option[Pk[Long]], debit: Debit, credit: Credit, note: String, time: Long = System.currentTimeMillis()) {
+case class Transaction(id: Option[Pk[Long]], userId:UserId, debit: Debit, credit: Credit, note: String, time: Long = System.currentTimeMillis()) {
   def dateTime: DateTime = new DateTime(time)
 
   def date: Date = dateTime.toDate
@@ -50,7 +50,7 @@ object Transaction {
   }
 }  */
 
-  val log = LoggerFactory.getLogger(this.getClass())
+  val log = LoggerFactory.getLogger(this.getClass)
   val systemUserId = UserId("0")
 
   // -- Parsers
@@ -60,19 +60,19 @@ object Transaction {
    */
   val simple = {
     get[Pk[Long]]("trans.id") ~
+      get[String]("trans.user_id") ~
       get[java.math.BigDecimal]("trans.credit_amount") ~
       get[Int]("trans.credit_account") ~
-      get[String]("trans.credit_user_id") ~
       get[java.math.BigDecimal]("trans.debit_amount") ~
       get[Int]("trans.debit_account") ~
-      get[String]("trans.debit_user_id") ~
       get[String]("trans.note") ~
       get[Date]("trans.created_date") map {
-      case id ~ creditAmount ~ creditAccount ~ creditUserId ~ debitAmount ~ debitAccount ~ debitUserId ~ note ~ created => {
+      case id ~ userId ~ creditAmount ~ creditAccount ~ debitAmount ~ debitAccount ~ note ~ created => {
         Transaction(
           Some(id),
-          Debit(debitAmount, Account(debitAccount), debitUserId),
-          Credit(creditAmount, Account(creditAccount), creditUserId),
+          UserId(userId),
+          Debit(debitAmount, Account(debitAccount)),
+          Credit(creditAmount, Account(creditAccount)),
           note, created.getTime
         )
       }
@@ -94,7 +94,7 @@ object Transaction {
   def findTransactions(userId: UserId): Seq[Transaction] = {
     DB.withConnection {
       implicit connection =>
-        SQL("select * from trans where credit_user_id = {userId} or debit_user_id = {userId}").on(
+        SQL("select * from trans where user_id = {userId}").on(
           'userId -> userId.value
         ).as(Transaction.simple *)
     }
@@ -113,9 +113,9 @@ object Transaction {
   def create(userId: UserId, sek: SEK, reference: BankReference, time: Long = System.currentTimeMillis()): Transaction = {
     val amount = sek.value
     val transaction = if (amount > 0) {
-      Transaction(None, Debit(amount, Bank, userId), Credit(amount, UserSek, userId), reference.value, time)
+      Transaction(None, userId, Debit(amount, Bank), Credit(amount, UserSek), reference.value, time)
     } else {
-      Transaction(None, Debit(-amount, UserSek, userId), Credit(-amount, Bank, userId), reference.value, time)
+      Transaction(None, userId, Debit(-amount, UserSek), Credit(-amount, Bank), reference.value, time)
     }
     create(transaction)
   }
@@ -135,19 +135,19 @@ object Transaction {
           """
             insert into trans values (
               {id},
-              {credit_amount}, {credit_account}, {credit_user_id},
-              {debit_amount}, {debit_account}, {debit_user_id},
+              {user_id},
+              {credit_amount}, {credit_account},
+              {debit_amount}, {debit_account},
               {note}, {trans_id}, {created}
             )
           """
         ).on(
           'id -> id,
+          'user_id -> trans.userId.value,
           'credit_amount -> new java.math.BigDecimal(trans.credit.amount.toString()),
           'credit_account -> trans.credit.account.number,
-          'credit_user_id -> trans.credit.userId.value,
           'debit_amount -> new java.math.BigDecimal(trans.debit.amount.toString()),
           'debit_account -> trans.debit.account.number,
-          'debit_user_id -> trans.debit.userId.value,
           'trans_id -> trans.id,
           'created -> trans.date,
           'note -> trans.note

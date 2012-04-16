@@ -21,14 +21,14 @@ class TransactionSpec extends Specification {
     "Create a add fund transaction" in {
       running(FakeApplication()) {
         val t = Transaction.create(userId, sek, reference, time)
-        t must_== Transaction(Some(Id(1000)), Debit(amount, Bank, userId), Credit(amount, UserSek, userId), reference.value, time)
+        t must_== Transaction(Some(Id(1000)), userId, Debit(amount, Bank), Credit(amount, UserSek), reference.value, time)
       }
     }
 
     "Create a subtract fund transaction" in {
       running(FakeApplication()) {
         val t = Transaction.create(userId, -sek, reference, time)
-        t must_== Transaction(Some(Id(1000)), Debit(amount, UserSek, userId), Credit(amount, Bank, userId), reference.value, time)
+        t must_== Transaction(Some(Id(1000)), userId, Debit(amount, UserSek), Credit(amount, Bank), reference.value, time)
       }
     }
 
@@ -48,19 +48,19 @@ class TransactionSpec extends Specification {
       running(FakeApplication()) {
         Transaction.create(userId, sek, reference, time)
         Transaction.create(userId, -sek, reference, time)
-        val t1 = Transaction(Some(Id(1000)), Debit(amount, Bank, userId), Credit(amount, UserSek, userId), reference.value, time)
-        val t2 = Transaction(Some(Id(1001)), Debit(amount, UserSek, userId), Credit(amount, Bank, userId), reference.value, time)
+        val t1 = Transaction(Some(Id(1000)), userId, Debit(amount, Bank), Credit(amount, UserSek), reference.value, time)
+        val t2 = Transaction(Some(Id(1001)), userId, Debit(amount, UserSek), Credit(amount, Bank), reference.value, time)
         Transaction.findTransactions(userId) must_== Seq(t1, t2)
       }
     }
 
     "have a dateTime" in {
-      val transaction = Transaction(Some(Id(1000)), Debit(100, Bank, userId), Credit(100, UserBitcoin, userId), reference.value, time)
+      val transaction = Transaction(Some(Id(1000)), userId, Debit(100, Bank), Credit(100, UserBitcoin), reference.value, time)
       transaction.dateTime must_== new DateTime(time)
     }
 
     "have a date" in {
-      val transaction = Transaction(Some(Id(1000)), Debit(100, Bank, userId), Credit(100, UserBitcoin, userId), reference.value, time)
+      val transaction = Transaction(Some(Id(1000)), userId, Debit(100, Bank), Credit(100, UserBitcoin), reference.value, time)
       transaction.date must_== new Date(time)
     }
 

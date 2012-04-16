@@ -28,14 +28,11 @@ case object UserBitcoin extends Account(2100) with Liability
 
 case object UserSek extends Account(2200) with Liability
 
-abstract class DebitCredit(amount: BigDecimal, account: Account, userId: UserId) {
+abstract class DebitCredit(amount: BigDecimal, account: Account)
 
+case class Credit(amount: BigDecimal, account: Account) extends DebitCredit(amount, account)
 
-}
-
-case class Credit(amount: BigDecimal, account: Account, userId: UserId) extends DebitCredit(amount, account, userId)
-
-case class Debit(amount: BigDecimal, account: Account, userId: UserId) extends DebitCredit(amount, account, userId)
+case class Debit(amount: BigDecimal, account: Account) extends DebitCredit(amount, account)
 
 
 
