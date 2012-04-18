@@ -5,14 +5,14 @@
 CREATE SEQUENCE trans_id_seq start with 1000;
 CREATE TABLE trans (
     id integer NOT NULL DEFAULT nextval('trans_id_seq'),
-    user_id varchar(255),
-    credit_amount decimal(12,8),
-    credit_account int(8),
-    debit_amount decimal(12,8),
-    debit_account int(8),
+    user_id varchar(255) NOT NULL,
+    credit_amount decimal(12,8) default 0,
+    credit_account int(8) NOT NULL,
+    debit_amount decimal(12,8) DEFAULT 0,
+    debit_account int(8) NOT NULL,
     note varchar(255),
     external_id varchar (255),
-    created_date timestamp
+    created_date timestamp NOT NULL
 );
 
 -- CREATE SEQUENCE user_id_seq start with 1000;

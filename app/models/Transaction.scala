@@ -34,7 +34,7 @@ ReservationSälj 2012-04-06 user1 (50 BTC => Reserved BTC)  ref => OrderId
  id, date, user, debit_account, debit,  credit_account, credit, type, note
 
  */
-case class Transaction(id: Option[Pk[Long]], userId:UserId, debit: Debit, credit: Credit, note: String, time: Long = System.currentTimeMillis()) {
+case class Transaction(id: Option[Pk[Long]], userId: UserId, debit: Debit, credit: Credit, note: String, time: Long = System.currentTimeMillis()) {
   def dateTime: DateTime = new DateTime(time)
 
   def date: Date = dateTime.toDate
@@ -42,6 +42,7 @@ case class Transaction(id: Option[Pk[Long]], userId:UserId, debit: Debit, credit
 
 
 object Transaction {
+
 
   /* def apply[A <: Currency[A], P <: Currency[P]](trade:Trade[A, P], userId:UserId):Transaction[A, P] = {
   trade match {
@@ -91,6 +92,11 @@ object Transaction {
 
   }
 
+  /**
+   * Finds all transactions for a given userId
+   * @param userId  the userId
+   * @return all transactions belonging to this userId
+   */
   def findTransactions(userId: UserId): Seq[Transaction] = {
     DB.withConnection {
       implicit connection =>
@@ -100,7 +106,40 @@ object Transaction {
     }
   }
 
+
+  def balanceSEK(userId: UserId): SEK = SEK(balance(userId, UserSek))
+
+  def balanceReservedSEK(userId: UserId): SEK = SEK(balance(userId, UserReservedSek))
+
+  def balance(userId: UserId, account: Account): BigDecimal = {
+
+    def sumBalance(column: String): BigDecimal = {
+      val balance = try {
+        DB.withConnection {
+          implicit connection =>
+            SQL("select sum(" + column + "_amount) from trans where user_id = {userId} and " + column + "_account = {account} ").on(
+              'userId -> userId.value,
+              'account -> account.number
+            ).as(scalar[java.math.BigDecimal].single)
+        }
+      } catch {
+        case e: Exception => java.math.BigDecimal.ZERO
+      }
+      BigDecimal(balance)
+    }
+
+    val credit = sumBalance("credit")
+    val debit = sumBalance("debit")
+    credit - debit
+
+  }
+
+
   case class BankReference(value: String)
+
+  case class OrderReference(value: String)
+
+  // Todo use orderId
 
   case class CourtageReference(value: String)
 
@@ -110,16 +149,22 @@ object Transaction {
   /**
    * Creates an fund transaction
    */
-  def create(userId: UserId, sek: SEK, reference: BankReference, time: Long = System.currentTimeMillis()): Transaction = {
-    val amount = sek.value
+  def fund(userId: UserId, sek: SEK, reference: BankReference, time: Long = System.currentTimeMillis()): Transaction = {
+    create(userId, sek.value, Bank, UserSek, reference.value, time)
+  }
+
+  def reserve(userId: UserId, sek: SEK, reference: OrderReference, time: Long = System.currentTimeMillis()): Transaction = {
+    create(userId, sek.value, UserSek, UserReservedSek, reference.value, time)
+  }
+
+  def create(userId: UserId, amount: BigDecimal, debit: Account, credit: Account, note: String, time: Long): Transaction = {
     val transaction = if (amount > 0) {
-      Transaction(None, userId, Debit(amount, Bank), Credit(amount, UserSek), reference.value, time)
+      Transaction(None, userId, Debit(amount, debit), Credit(amount, credit), note, time)
     } else {
-      Transaction(None, userId, Debit(-amount, UserSek), Credit(-amount, Bank), reference.value, time)
+      Transaction(None, userId, Debit(-amount, credit), Credit(-amount, debit), note, time)
     }
     create(transaction)
   }
-
 
   /**
    * Create a Transaction.
@@ -171,13 +216,5 @@ object TransactionId {
 
 case class TransactionId(value: String)
 
-
-//case class SekAccount(value: SEK, userId: UserId) extends DebitCredit(1, value.value, userId)
-
-//case class ReservedSekAccount(value: SEK, userId: UserId) extends DebitCredit(2, value.value, userId)
-
-//case class BtcAccount(value: BTC, userId: UserId) extends DebitCredit(3, value.value, userId)
-
-//case class ReservedBtcAccount(value: BTC, userId: UserId) extends DebitCredit(4, value.value, userId)
 
 
