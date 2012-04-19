@@ -107,9 +107,11 @@ object Transaction {
   }
 
 
-  def balanceSEK(userId: UserId): SEK = SEK(balance(userId, UserSek))
+  def balanceSEK(userId: UserId) = SEK(balance(userId, UserSek))
 
-  def balanceReservedSEK(userId: UserId): SEK = SEK(balance(userId, UserReservedSek))
+  def balanceReservedSEK(userId: UserId) = SEK(balance(userId, UserReservedSek))
+
+  def balanceBTC(userId: UserId) = BTC(balance(userId, UserBtc))
 
   def balance(userId: UserId, account: Account): BigDecimal = {
 
@@ -134,27 +136,58 @@ object Transaction {
 
   }
 
-
-  case class BankReference(value: String)
-
-  case class OrderReference(value: String)
-
-  // Todo use orderId
-
-  case class CourtageReference(value: String)
-
-  case class BitcoinAddressReference(value: String)
-
-
   /**
-   * Creates an fund transaction
+   * Creates a SEK fund transaction
    */
-  def fund(userId: UserId, sek: SEK, reference: BankReference, time: Long = System.currentTimeMillis()): Transaction = {
-    create(userId, sek.value, Bank, UserSek, reference.value, time)
+  def fund(userId: UserId, sek: SEK, reference: BankReference): Transaction = {
+    create(userId, sek.value, BankSek, UserSek, reference.value, System.currentTimeMillis())
+  }
+  /**
+   * Creates a SEK fund transaction
+   */
+  def fund(userId: UserId, sek: SEK, reference: BankReference, time: Long): Transaction = {
+    create(userId, sek.value, BankSek, UserSek, reference.value, time)
   }
 
-  def reserve(userId: UserId, sek: SEK, reference: OrderReference, time: Long = System.currentTimeMillis()): Transaction = {
+  /**
+   * Creates a BTC fund transaction
+   */
+  def fund(userId: UserId, btc: BTC, reference: BtcAddressReference): Transaction = {
+    create(userId, btc.value, BankBtc, UserBtc, reference.value, System.currentTimeMillis())
+  }
+
+  /**
+   * Creates a BTC fund transaction
+   */
+  def fund(userId: UserId, btc: BTC, reference: BtcAddressReference, time: Long): Transaction = {
+    create(userId, btc.value, BankBtc, UserBtc, reference.value, time)
+  }
+
+  /**
+   * Creates a reserve SEK transaction
+   */
+  def reserve(userId: UserId, sek: SEK, reference: OrderReference): Transaction = {
+    create(userId, sek.value, UserSek, UserReservedSek, reference.value, System.currentTimeMillis())
+  }
+  /**
+   * Creates a reserve SEK transaction
+   */
+  def reserve(userId: UserId, sek: SEK, reference: OrderReference, time:Long): Transaction = {
     create(userId, sek.value, UserSek, UserReservedSek, reference.value, time)
+  }
+
+  /**
+   * Creates a reserve BTC transaction
+   */
+  def reserve(userId: UserId, btc: BTC, reference: OrderReference): Transaction = {
+    create(userId, btc.value, UserSek, UserReservedSek, reference.value, System.currentTimeMillis())
+  }
+
+  /**
+   * Creates a reserve BTC transaction
+   */
+  def reserve(userId: UserId, btc: BTC, reference: OrderReference, time: Long): Transaction = {
+    create(userId, btc.value, UserBtc, UserReservedBtc, reference.value, time)
   }
 
   def create(userId: UserId, amount: BigDecimal, debit: Account, credit: Account, note: String, time: Long): Transaction = {
