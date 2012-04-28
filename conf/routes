@@ -16,6 +16,7 @@ POST   /register              controllers.NotLoggedIn.registerUser
 #
 # Home
 GET     /home                  controllers.Application.home
+# Should be POST?
 GET     /logout                controllers.Application.logout
 
 # OrderBook
@@ -35,6 +36,15 @@ GET     /funds/add                     controllers.Funds.add
 #POST  /funds/add                    controllers.Funds.orderAdd
 GET     /funds/withdraw           controllers.Funds.withdraw
 POST   /fund/withdraw             controllers.Funds.orderWithdraw
+
+
+#Admin
+GET   /admin/                              controllers.Admin.index
+GET   /admin/transactions           controllers.Admin.transactions
+GET   /admin/users                      controllers.Admin.users
+POST  /admin/logout                   controllers.Admin.logout
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file         controllers.Assets.at(path="/public", file)

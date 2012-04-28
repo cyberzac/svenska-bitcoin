@@ -1,0 +1,7 @@
+@(admin: AdminUser, transactions:List[Transaction])
+@admin_main(admin) {
+   <table>
+       <tr><th>Datum</th><th>BTC</th><th>Pris</th><th>Totalt</th></tr>
+       @transactions.map { transaction =>  @views.html.admin.transaction(transaction) }
+   </table>
+}

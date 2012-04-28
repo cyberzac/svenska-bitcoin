@@ -1,5 +1,6 @@
 @(user: User)
 @main(user=Some(user)) {
+
    <table>
        <tr><th>Valuta</th><th>Saldo</th></tr>
        <tr><td>SEK</td><td>@user.balance.sek.value</td></tr>

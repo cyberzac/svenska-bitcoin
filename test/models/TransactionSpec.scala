@@ -11,7 +11,7 @@ class TransactionSpec extends Specification {
 
   "A transaction" should {
 
-    val userId = UserId("userId")
+    val userId = UserId(1)
     val bankRef = BankReference("123455")
     val orderRef = OrderReference("123455")
     val time = System.currentTimeMillis()

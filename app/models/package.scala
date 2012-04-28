@@ -6,9 +6,7 @@ package object models {
 
   implicit def stringToPassword(clear: String) = Password(clear)
 
-  implicit def stringToUserId(userId: String) = UserId(userId)
-
-  implicit def intToUserId(userId: Int) = UserId(userId.toString)
+  implicit def longToUserId(userId: Long) = UserId(userId)
 
   implicit def bigDecimalToBTC(amount: BigDecimal) = BTC(amount)
 

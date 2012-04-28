@@ -1,45 +1,30 @@
 package models
 
-import util.Random
-import collection.mutable.WrappedArray
+import org.jasypt.digest.PooledStringDigester
 
 object Password {
 
-  val saltSize = 20
   val hashAlgorithm = "SHA1"
-  val random = new Random()
+  val iterations = 50000
+  val digester = new PooledStringDigester();
+  digester.setPoolSize(4); // This would be a good value for a 4-core system
+  digester.setAlgorithm(hashAlgorithm);
+  digester.setIterations(iterations);
+
 
   def apply(clear: String): Password = {
-    val salt = createSalt
-    apply(salt, clear)
+    val digest = digester.digest(clear)
+    Password(PasswordDigest(digest))
   }
 
-  def apply(salt: Array[Byte], clear: String): Password = {
-    new Password(salt, hash(salt, clear))
-  }
 
-  def createSalt: Array[Byte] = {
-    var bytes = new Array[Byte](saltSize)
-    random.nextBytes(bytes)
-    bytes
-  }
-
-  def hash(salt: Array[Byte], value: String): Array[Byte] = {
-    import java.security.MessageDigest
-    val digester = MessageDigest.getInstance(hashAlgorithm)
-    digester.update(salt)
-    digester.digest(value.getBytes)
-  }
-
-  def toHexString(bytes: Array[Byte]): String = bytes.map("%02X" format _).mkString
 }
 
-case class Password(salt: Array[Byte], hashed: Array[Byte]) {
+case class PasswordDigest(value:String)
 
-  def toHexString = Password.toHexString(salt ++ hashed)
-
-  def equals(password: String): Boolean = {
-    val otherHash = Password.hash(salt, password)
-    ((otherHash): WrappedArray[Byte]) == ((hashed): WrappedArray[Byte])
+case class Password(digest: PasswordDigest) {
+  def equals(clear: String): Boolean = {
+    Password.digester.matches(clear, digest.value)
   }
+
 }

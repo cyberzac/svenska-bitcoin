@@ -5,9 +5,8 @@ import org.specs2.execute.Success
 
 class OrderBookSpec extends Specification {
 
-  val userService = InMemoryUserService()
-  val sellerId = UserId("seller")
-  val buyerId = UserId("buyer")
+  val sellerId = UserId(1L)
+  val buyerId = UserId(2L)
 
   "An OrderBook" should {
 

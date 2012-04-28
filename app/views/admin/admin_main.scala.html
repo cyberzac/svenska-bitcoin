@@ -1,0 +1,39 @@
+@(admin:AdminUser)(content: Html)
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Svenska Bitcoin Admin</title>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+</head>
+<body>
+<header>
+    <a href="@routes.Admin.index" id="logo">Admin</a>
+    <dl id="user">
+        <dt>@admin.user.name.value <span>(@admin.user.email.value)</span></dt>
+        <dd>
+            <a href="@routes.Admin.logout()">Logout</a>
+        </dd>
+    </dl>
+</header>
+
+<nav>
+    <section>
+        <ul>
+            <li><a href="@routes.Admin.transactions">Transaktioner</a></li>
+            <li><a href="@routes.Admin.users">Användare</a></li>
+        </ul>
+    </section>
+</nav>
+
+<section id="main">
+    <article>
+        @content
+    </article>
+</section>
+<footer>
+    Svenska Bitcoin, <a href="mailto:info@@svenskabitcoin.se">info@@svenskabitcoin.se</a>
+</footer>
+</body>
+</html>

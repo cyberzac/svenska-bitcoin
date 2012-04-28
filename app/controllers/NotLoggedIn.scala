@@ -110,19 +110,20 @@ trait Secured {
   /**
    * Retrieve the connected user email.
    */
-   def username(request: RequestHeader) = request.session.get("email")
+  def username(request: RequestHeader) = request.session.get("email")
 
   /**
    * Action for authenticated users.
    */
-  def IsAuthenticated(f: => String => Request[AnyContent] => Result) = Security.Authenticated(username, onUnauthorized) { user =>
-    Action(request => f(user)(request))
+  def IsAuthenticated(f: => String => Request[AnyContent] => Result) = Security.Authenticated(username, onUnauthorized) {
+    user =>
+      Action(request => f(user)(request))
   }
 
   /**
    * Redirect to login if the use in not authorized.
    */
-   def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.NotLoggedIn.login())
+  def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.NotLoggedIn.login())
 
 }
 

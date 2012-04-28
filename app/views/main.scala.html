@@ -1,4 +1,4 @@
-@(title: String = "Svenska Bitcoin", user:Option[User] = None )(content: Html)
+@(title: String = "Svenska Bitcoin", user:Option[User] = None)(content: Html)
 <!DOCTYPE html>
 <html lang="sv">
     <head>
@@ -26,21 +26,21 @@
 
         <nav>
             <section>
-            <ul>
-                @if(user.isDefined) {
+                <ul>
+                    @if(user.isDefined) {
                     <li><a href="@routes.Application.bidOrder">K&ouml;porder</a></li>
                     <li><a href="@routes.Application.askOrder">S&auml;ljorder</a></li>
                     <li><a href="@routes.Application.home">Saldo</a></li>
                     <li><a href="@routes.Application.userOrders">Mina order</a></li>
                     <li><a href="@routes.Application.trades">Mina Avslut</a></li>
                     <li><a href="@routes.Funds.index">Överföringar</a></li>
-                } else {
+                    } else {
                     <li><a href="@routes.NotLoggedIn.login">Logga in</a></li>
-                }
-                <li><a href="@routes.Application.orders">Orderbok</a></li>
-                <li><a href="about">Om oss</a></li>
-                <li><a href="bitcoin">Om Bitcoin</a><li>
-            </ul>
+                    }
+                    <li><a href="@routes.Application.orders">Orderbok</a></li>
+                    <li><a href="about">Om oss</a></li>
+                    <li><a href="bitcoin">Om Bitcoin</a><li>
+                </ul>
             </section>
         </nav>
 

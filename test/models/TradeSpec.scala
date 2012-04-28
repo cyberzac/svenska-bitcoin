@@ -5,8 +5,8 @@ import org.joda.time.DateTime
 
 class TradeSpec extends Specification {
 
-  val seller = UserId("seller")
-  val buyer = UserId("buyer")
+  val seller = UserId(1)
+  val buyer = UserId(2)
   val askOrder = AskOrderSEK(BTC(10), SEK(40), seller)
   val bidOrder = BidOrderSEK(BTC(6), SEK(50), buyer)
 

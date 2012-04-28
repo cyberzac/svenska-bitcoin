@@ -3,7 +3,7 @@ package models
 import akka.actor.Actor
 import org.slf4j.LoggerFactory
 
-class UserActor(val userId: UserId, val userService: UserService) extends Actor {
+class UserActor(val userId: UserId) extends Actor {
 
   val log = LoggerFactory.getLogger(classOf[UserActor])
 
@@ -14,18 +14,18 @@ class UserActor(val userId: UserId, val userService: UserService) extends Actor 
     }
     case trade@Trade(time: Long, id: TradeId, amount: BTC, price: SEK, seller, `userId`) => {
      // Todo replace with sum of matching trades in TradeService
-      val user = userService.findById(userId).get
+      val user = User.findById(userId).get
       log.info(user.name + " bought " + amount + " at " + price + "/BTC")
     }
 
     case trade@Trade(time: Long, id: TradeId, amount: BTC, price: SEK, `userId`, buyer) => {
-      val user = userService.findById(userId).get
+      val user = User.findById(userId).get
       log.info(user.name + " sold " + amount + " at " + price + "/BTC")
     }
 
     case GetUserMsg => {
       // Todo remove this
-      val user = userService.findById(userId).get
+      val user = User.findById(userId).get
       log.debug("Returning user {}", user)
       sender ! user
     }

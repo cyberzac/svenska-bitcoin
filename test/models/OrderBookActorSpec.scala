@@ -34,10 +34,10 @@ class OrderBookActorSpec extends Specification with Mockito {
   val duration = Duration("5 seconds")
   implicit val timeout = Timeout(duration)
   val tradeService = mock[TradeService[BTC, SEK]]
-  val sellerId = UserId("sellerId")
+  val sellerId = UserId(1L)
   val askOrderSEK_10_5 = AskOrderSEK(BTC(10), SEK(5), sellerId)
   val askOrderSEK_10_6 = AskOrderSEK(BTC(10), SEK(6), sellerId)
-  val buyerId = UserId("buyerId")
+  val buyerId = UserId(2L)
   val bidOrderSEK_9_4 = BidOrderSEK(BTC(9), SEK(4), buyerId)
 
 

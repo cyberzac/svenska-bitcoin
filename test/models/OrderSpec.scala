@@ -3,7 +3,7 @@ package models
 import org.specs2.mutable.Specification
 
 class OrderSpec extends Specification {
-  val userId = UserId("1")
+  val userId = UserId(1)
   val askOrderSEK = AskOrderSEK(BTC(10), SEK(5), userId)
 
   "AskOrderSEK" should {

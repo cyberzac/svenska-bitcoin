@@ -52,7 +52,6 @@ object Transaction {
 }  */
 
   val log = LoggerFactory.getLogger(this.getClass)
-  val systemUserId = UserId("0")
 
   // -- Parsers
 
@@ -61,7 +60,7 @@ object Transaction {
    */
   val simple = {
     get[Pk[Long]]("trans.id") ~
-      get[String]("trans.user_id") ~
+      get[Long]("trans.user_id") ~
       get[java.math.BigDecimal]("trans.credit_amount") ~
       get[Int]("trans.credit_account") ~
       get[java.math.BigDecimal]("trans.debit_amount") ~
@@ -89,7 +88,14 @@ object Transaction {
           'id -> id
         ).as(Transaction.simple.singleOpt)
     }
+  }
 
+
+  def findAll: scala.List[Transaction] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL("select * from trans").as(Transaction.simple *)
+    }
   }
 
   /**

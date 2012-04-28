@@ -22,10 +22,10 @@ class packageSpec extends Specification {
       password.equals(clear) must beTrue
     }
   }
-  "convert a string to an UserId" in {
-    val userIdString = "userId"
-    val userId: UserId = userIdString
-    userId must_== UserId(userIdString)
+  "convert a long to an UserId" in {
+    val userIdLong = 10L
+    val userId: UserId = userIdLong
+    userId must_== UserId(userIdLong)
   }
 
   "The implicit conversions for Price" should {

@@ -15,7 +15,8 @@ object ApplicationBuild extends Build {
     "org.mockito" % "mockito-all" % "1.9.0",
     "org.slf4j" % "slf4j-api" % slf4jVersion,
     "ch.qos.logback" % "logback-core" % logbackVersion,
-    "ch.qos.logback" % "logback-classic" % logbackVersion
+    "ch.qos.logback" % "logback-classic" % logbackVersion,
+    "org.jasypt" % "jasypt" % "1.9.0"
   )
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(

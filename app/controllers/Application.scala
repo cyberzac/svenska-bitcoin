@@ -3,10 +3,8 @@ package controllers
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import play.Logger
 
 import views._
-import java.util.UUID
 import models._
 import akka.pattern.ask
 import akka.dispatch.Await
@@ -21,7 +19,7 @@ object Application extends Controller with Secured {
       PlayActorService.getUserByEmail(Email(username)).map {
         user =>
           Ok(html.home(user))
-      }.getOrElse(Forbidden)
+      }.getOrElse(Unauthorized)
   }
 
   val orderForm = Form(
@@ -38,7 +36,7 @@ object Application extends Controller with Secured {
     username => implicit request =>
       PlayActorService.getUserByEmail(Email(username)).map {
         user => Ok(html.bid(user, orderForm))
-      }.getOrElse(Forbidden)
+      }.getOrElse(Unauthorized)
   }
 
   /**
@@ -60,7 +58,7 @@ object Application extends Controller with Secured {
             }
           }
           )
-      }.getOrElse(Forbidden)
+      }.getOrElse(Unauthorized)
   }
 
   /**
@@ -70,7 +68,7 @@ object Application extends Controller with Secured {
     username => implicit request =>
       PlayActorService.getUserByEmail(Email(username)).map {
         user => Ok(html.ask(user, orderForm))
-      }.getOrElse(Forbidden)
+      }.getOrElse(Unauthorized)
   }
 
   /**
@@ -92,7 +90,7 @@ object Application extends Controller with Secured {
             }
           }
           )
-      }.getOrElse(Forbidden)
+      }.getOrElse(Unauthorized)
   }
 
 
@@ -105,10 +103,10 @@ object Application extends Controller with Secured {
         user =>
           val trades = PlayActorService.getTrades(user)
           Ok(html.trades(Some(user), trades))
-      }.getOrElse(Forbidden)
+      }.getOrElse(Unauthorized)
   }
 
-/**
+  /**
    * List all active orders for a user
    * @return
    */
@@ -121,7 +119,7 @@ object Application extends Controller with Secured {
           val future = akka.pattern.ask(PlayActorService.orderBookActor, ListOrders(userId)).mapTo[Orders[BTC, SEK]]
           val orders = Await.result(future, PlayActorService.duration)
           Ok(html.userorders(Some(user), orders.askOrders, orders.bidOrders))
-      }.getOrElse(Forbidden)
+      }.getOrElse(Unauthorized)
   }
 
   /**
