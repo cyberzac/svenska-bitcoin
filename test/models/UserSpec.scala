@@ -12,9 +12,9 @@ class UserSpec extends Specification {
       val user = User.create(Name("name1"), Email("mail1"), "password1")
       user.name must_== Name("name1")
       user.email must_== Email("mail1")
-      user.password.equals("password1") must_== true
+      user.password.equals("password1") must beTrue
       user.balance must_== Balance()
-      }
+    }
 
     "Throw exception if trying to create new user the the same email" in running(FakeApplication()) {
       User.create(Name("name1"), Email("mail1"), "password1")
@@ -37,54 +37,44 @@ class UserSpec extends Specification {
       val found = User.findById(created.id.get)
       verifyUser(found, created)
     }
- /*
 
-    "Return None for an unknown id" in {
-      dut.empty()
-      val found = dut.findById(UserId("not found"))
-      found.isDefined must_== false
+    "Return None for an unknown id" in running(FakeApplication()) {
+      val found = User.findById(UserId(-1))
+      found must beNone
     }
 
-    "Update an existing user" in {
-      dut.empty()
-      val created = dut.create("name1", "mail1", "password1")
+    "Update an existing user" in running(FakeApplication()) {
+      val created = User.create("name1", "mail1", "password1")
       val changed = created.copy(email = Email("mail2"))
-      val updated = dut.update(changed)
+      val updated = User.update(changed)
       updated must_== changed
-      dut.findByEmail(Email("mail1")) must beNone
-      dut.findByEmail(Email("mail2")) must beSome(updated)
+      User.findByEmail(Email("mail1")) must beNone
+      User.findByEmail(Email("mail2")) must beSome(updated)
     }
 
-    "Update a non existing user" in {
-      dut.empty()
-      val user = User("name", "mail", "1", "password")
-      dut.update(user)
-      dut.findByEmail("mail") must beSome(user)
-      dut.findById("1") must beSome(user)
+    "Throw an IllegalArgumentException on update a non existing user" in running(FakeApplication()) {
+      User.update(User(None, "name", "mail", "password", Balance())) must throwAn[IllegalArgumentException]
     }
 
-    "Throw an excpetion when trying to update the email to another users email" in {
-      dut.empty()
-      val created = dut.create("name1", "mail1", "password1")
-      dut.create("name2", "mail2", "password2")
-      val changed = created.copy(email = Email("mail2"))
-      dut.update(changed) must throwAn[IllegalArgumentException]
-    }
+      "Throw an exception when trying to update the email to another users email" in running(FakeApplication()){
+        val created = User.create("name1", "mail1", "password1")
+        User.create("name2", "mail2", "password2")
+        val changed = created.copy(email = Email("mail2"))
+        User.update(changed) must throwAn[Exception]
+      }
 
-    "Throw an exception when trying to update the userId" in {
-      dut.empty()
-      val user = User("name", "mail", "1", "password")
-      dut.update(user)
-      val updated = user.copy(userId = "2")
-      dut.update(updated) must throwAn[IllegalArgumentException]
-    }
-  */
+      "Throw an exception when trying to update the userId" in running(FakeApplication()) {
+        val user = User.create("name", "mail", "password")
+        val user2 = User.create("name2", "mail2", "password2")
+        val updated = user.copy(id = user2.id)
+        User.update(updated) must throwAn[Exception]
+      }
 
   }
 
   private def verifyUser(actual: Option[User], expected: User) = {
     actual must beSome[User]
-    val user = actual.getOrElse(failure("User is None"))
+    val user = actual.get
     user.id must_== expected.id
     user.name must_== expected.name
     user.email must_== expected.email

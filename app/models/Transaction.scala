@@ -148,6 +148,7 @@ object Transaction {
   def fund(userId: UserId, sek: SEK, reference: BankReference): Transaction = {
     create(userId, sek.value, BankSek, UserSek, reference.value, System.currentTimeMillis())
   }
+
   /**
    * Creates a SEK fund transaction
    */
@@ -175,10 +176,11 @@ object Transaction {
   def reserve(userId: UserId, sek: SEK, reference: OrderReference): Transaction = {
     create(userId, sek.value, UserSek, UserReservedSek, reference.value, System.currentTimeMillis())
   }
+
   /**
    * Creates a reserve SEK transaction
    */
-  def reserve(userId: UserId, sek: SEK, reference: OrderReference, time:Long): Transaction = {
+  def reserve(userId: UserId, sek: SEK, reference: OrderReference, time: Long): Transaction = {
     create(userId, sek.value, UserSek, UserReservedSek, reference.value, time)
   }
 
@@ -213,7 +215,7 @@ object Transaction {
       implicit connection =>
 
       // Get the trans id
-        val id: Long = SQL("select next value for trans_id_seq").as(scalar[Long].single)
+        val id: Long = SQL("select next value for trans_seq").as(scalar[Long].single)
 
         SQL(
           """

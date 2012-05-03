@@ -2,6 +2,8 @@ package models
 
 import org.specs2.mutable.Specification
 import org.joda.time.DateTime
+import play.api.test.FakeApplication
+import play.api.test.Helpers._
 
 class TradeSpec extends Specification {
 
@@ -12,19 +14,22 @@ class TradeSpec extends Specification {
 
   "A Trade " should {
 
-    val trade = Trade(askOrder, bidOrder, SEK(40))
-    "Be created from orders with correct amount" in {
+    "Be created from orders with correct amount" in running(FakeApplication()) {
+      val trade = Trade(askOrder, bidOrder, SEK(40))
       trade.amount must_== BTC(6)
     }
-    "Be created from orders with correct price" in {
+    "Be created from orders with correct price" in running(FakeApplication()) {
+      val trade = Trade(askOrder, bidOrder, SEK(40))
       trade.price must_== SEK(40)
     }
 
-    "Have a dateTime member" in {
+    "Have a dateTime member" in running(FakeApplication()) {
+      val trade = Trade(askOrder, bidOrder, SEK(40))
       trade.dateTime must_== new DateTime(trade.time)
     }
 
-    "Have a total" in {
+    "Have a total" in running(FakeApplication()) {
+      val trade = Trade(askOrder, bidOrder, SEK(40))
       trade.total must_== SEK(240)
     }
   }

@@ -9,16 +9,16 @@ class UserActor(val userId: UserId) extends Actor {
 
   def receive: Receive = {
 
-    case trade@Trade(time: Long, id: TradeId, amount: BTC, price: SEK, `userId`, `userId`) => {
+    case trade@Trade(id: TradeId, amount: BTC, price: SEK, `userId`, `userId`, time: Long) => {
       log.info("Ignoring trade with myself " + trade)
     }
-    case trade@Trade(time: Long, id: TradeId, amount: BTC, price: SEK, seller, `userId`) => {
-     // Todo replace with sum of matching trades in TradeService
+    case trade@Trade(id: TradeId, amount: BTC, price: SEK, seller, `userId`, time: Long) => {
+      // Todo replace with sum of matching trades in TradeService
       val user = User.findById(userId).get
       log.info(user.name + " bought " + amount + " at " + price + "/BTC")
     }
 
-    case trade@Trade(time: Long, id: TradeId, amount: BTC, price: SEK, `userId`, buyer) => {
+    case trade@Trade(id: TradeId, amount: BTC, price: SEK, `userId`, buyer, time: Long) => {
       val user = User.findById(userId).get
       log.info(user.name + " sold " + amount + " at " + price + "/BTC")
     }

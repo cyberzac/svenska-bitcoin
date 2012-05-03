@@ -1,6 +1,5 @@
 package models
 
-
 import anorm._
 import anorm.SqlParser._
 import java.util.Date
@@ -64,7 +63,7 @@ object User {
       implicit connection =>
 
       // Get the trans id
-        val id: Long = SQL("select next value for user_id_seq").as(scalar[Long].single)
+        val id: Long = SQL("select next value for user_seq").as(scalar[Long].single)
 
         SQL(
           """
@@ -102,7 +101,7 @@ object User {
     }
   }
 
-  def findById(userId: UserId):Option[User] = findById(Id(userId.value))
+  def findById(userId: UserId): Option[User] = findById(Id(userId.value))
 
   implicit def userId2Id(userId: UserId): Pk[Long] = Id(userId.value)
 
@@ -123,8 +122,27 @@ object User {
   /**
    * Updates a user
    */
-  def update(updatedUser: User): User = {
-    return updatedUser
+  def update(user: User): User = {
+    if (user.id.isEmpty) throw new IllegalArgumentException("Trying to update user not stored in database")
+    DB.withConnection {
+      implicit connection =>
+        SQL(
+          """
+          update user set
+          name = {name},
+          email = {email},
+          password = {password},
+          created_date = {created}
+          where id = {id}
+            """).on(
+          'id -> user.id,
+          'name -> user.name.value,
+          'email -> user.email.value,
+          'password -> user.password.digest.value,
+          'created -> user.date
+        ).executeUpdate()
+    }
+    return user
   }
 
   /**

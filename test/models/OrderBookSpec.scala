@@ -129,7 +129,7 @@ class OrderBookSpec extends Specification {
   }
 
   def trade(btc: Int, sek: Int): Trade[BTC, SEK] = {
-    Trade(btc, sek, sellerId, buyerId)
+    Trade(BTC(btc), SEK(sek), sellerId, buyerId)
   }
 
   def verifyOrders(orders: List[Order[BTC, SEK]], expected: Order[BTC, SEK]*) = {

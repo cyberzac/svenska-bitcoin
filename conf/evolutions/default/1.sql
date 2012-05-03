@@ -1,32 +1,21 @@
 # --- !Ups
 
-CREATE SEQUENCE trans_id_seq start with 1000;
-CREATE TABLE trans (
-    id integer NOT NULL DEFAULT nextval('trans_id_seq'),
-    user_id integer NOT NULL,
+create sequence trans_seq start with 1000;
+create table trans (
+    id integer not null default nextval('trans_seq'),
+    user_id integer not null,
     credit_amount decimal(12,8) default 0,
-    credit_account int(8) NOT NULL,
-    debit_amount decimal(12,8) DEFAULT 0,
-    debit_account int(8) NOT NULL,
+    credit_account int(8) not null,
+    debit_amount decimal(12,8) default 0,
+    debit_account int(8) not null,
     note varchar(255),
     external_id varchar (255),
-    created_date timestamp NOT NULL
+    created_date timestamp not null
 );
-
-CREATE SEQUENCE user_id_seq start with 1000;
-CREATE TABLE user (
-   id integer NOT NULL DEFAULT nextval('user_id_seq'),
-   name varchar(256) ,
-   email varchar(256) unique,
-   password varchar(256),
-   created_date timestamp NOT NULL
-)
 
 
 # --- !Downs
 
-DROP TABLE trans;
-DROP SEQUENCE trans_id_seq;
+drop table if exists trans;
+drop sequence if exists trans_seq;
 
-DROP TABLE user;
-DROP SEQUENCE user_id_seq;
