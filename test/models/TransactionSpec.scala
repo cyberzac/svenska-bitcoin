@@ -31,73 +31,67 @@ class TransactionSpec extends Specification {
       transaction.date must_== new Date(time)
     }
 
-    "Provide a add SEK fund transaction" in {
-      running(FakeApplication()) {
-        val t = Transaction.fund(userId, sek, bankRef, time)
-        t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, BankSek), Credit(sekAmount, UserSek), bankRef.value, time)
-      }
+    "Provide a add SEK fund transaction" in running(FakeApplication()) {
+      val t = Transaction.fund(userId, sek, bankRef, time)
+      t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, BankSek), Credit(sekAmount, UserSek), bankRef.value, time)
     }
 
-    "Provide a subtract SEK fund transaction" in {
-      running(FakeApplication()) {
-        val t = Transaction.fund(userId, -sek, bankRef, time)
-        t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, UserSek), Credit(sekAmount, BankSek), bankRef.value, time)
-      }
+    "Provide a subtract SEK fund transaction" in running(FakeApplication()) {
+      val t = Transaction.fund(userId, -sek, bankRef, time)
+      t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, UserSek), Credit(sekAmount, BankSek), bankRef.value, time)
     }
 
-    "Find a transaction by id" in {
-      running(FakeApplication()) {
-        val expected = Transaction.fund(userId, sek, bankRef, time)
-        val id = expected.id.get
-        val actual = Transaction.findTransaction(id).get
-        actual must_== expected
-      }
+
+    "Find a transaction by id" in running(FakeApplication()) {
+      val expected = Transaction.fund(userId, sek, bankRef, time)
+      val id = expected.id.get
+      val actual = Transaction.findTransaction(id).get
+      actual must_== expected
     }
 
-    "Provide a balanceSek method yielding zero if there are no transactions" in {
-      running(FakeApplication()) {
-        Transaction.balanceSEK(userId) must_== SEK(0)
-      }
+
+    "Provide a balanceSek method yielding zero if there are no transactions" in running(FakeApplication()) {
+      Transaction.balanceSEK(userId) must_== SEK(0)
     }
 
-    "Provide a balanceSek method yielding the sum of all UserSek transactions" in {
-      running(FakeApplication()) {
-        Transaction.fund(userId, SEK(10), bankRef)
-        Transaction.fund(userId, SEK(20), bankRef)
-        Transaction.fund(userId, SEK(-40), bankRef)
-        Transaction.balanceSEK(userId) must_== SEK(-10)
-      }
+    "Provide a balanceSek method yielding the sum of all UserSek transactions" in running(FakeApplication()) {
+      Transaction.fund(userId, SEK(10), bankRef)
+      Transaction.fund(userId, SEK(20), bankRef)
+      Transaction.fund(userId, SEK(-40), bankRef)
+      Transaction.balanceSEK(userId) must_== SEK(-10)
     }
 
-    "Provide a reserve SEK fund transaction" in {
-      running(FakeApplication()) {
-        val t = Transaction.reserve(userId, sek, orderRef, time)
-        t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, UserSek), Credit(sekAmount, UserReservedSek), bankRef.value, time)
-      }
+    "Provide a reserve SEK fund transaction" in running(FakeApplication()) {
+      val t = Transaction.reserve(userId, sek, orderRef, time)
+      t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, UserSek), Credit(sekAmount, UserReservedSek), bankRef.value, time)
     }
 
-    "Provide a balanceReservedSek method yielding the sum of all UserReservedSek transactions" in {
-      running(FakeApplication()) {
-        Transaction.fund(userId, SEK(10), bankRef)
-        Transaction.fund(userId, SEK(20), bankRef)
-        Transaction.reserve(userId, SEK(20), orderRef)
-        Transaction.balanceReservedSEK(userId) must_== SEK(20)
-      }
+    "Provide a balanceReservedSek method yielding the sum of all UserReservedSek transactions" in running(FakeApplication()) {
+      Transaction.fund(userId, SEK(10), bankRef)
+      Transaction.fund(userId, SEK(20), bankRef)
+      Transaction.reserve(userId, SEK(20), orderRef)
+      Transaction.balanceReservedSEK(userId) must_== SEK(20)
     }
 
-    "Provide a add BTC fund transaction" in {
-      running(FakeApplication()) {
-        Transaction.fund(userId, btc, bitcoinAddressReference, time)
-        Transaction.fund(userId, btc, bitcoinAddressReference)
-        Transaction.balanceBTC(userId) must_== btc * 2
-      }
+    "Provide an balanceBTC fund transaction" in running(FakeApplication()) {
+      Transaction.fund(userId, btc, bitcoinAddressReference, time)
+      Transaction.fund(userId, btc, bitcoinAddressReference)
+      Transaction.balanceBTC(userId) must_== btc * 2
     }
 
-    "Provide a reserve BTC fund transaction" in {
-      running(FakeApplication()) {
-        val t = Transaction.reserve(userId, btc, orderRef, time)
-        t must_== Transaction(Some(Id(1000)), userId, Debit(btcAmount, UserBtc), Credit(btcAmount, UserReservedBtc), bankRef.value, time)
-      }
+    "Provide a reserve BTC fund transaction" in running(FakeApplication()) {
+      val t = Transaction.reserve(userId, btc, orderRef, time)
+      t must_== Transaction(Some(Id(1000)), userId, Debit(btcAmount, UserBtc), Credit(btcAmount, UserReservedBtc), bankRef.value, time)
+    }
+
+    "Provide a balanceReservedBTC fund transaction" in running(FakeApplication()) {
+      Transaction.fund(userId, btc, bitcoinAddressReference, time)
+      Transaction.reserve(userId, btc, orderRef, time)
+      Transaction.balanceReservedBTC(userId) must_== btc
+    }
+
+    "Provide a balance function" in running(FakeApplication()) {
+     //Todo write test for balance
     }
 
     // Todo Throw an IllegalArgumentException if the transaction is not balanced.

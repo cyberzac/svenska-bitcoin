@@ -9,6 +9,7 @@ object ApplicationBuild extends Build {
   val retrievedManaged = true
   val logbackVersion = "1.0.0"
   val slf4jVersion = "1.6.2"
+  val scalaVersion = "2.9.2"
 
   val appDependencies = Seq(
     // Add your project dependencies here,

@@ -112,12 +112,15 @@ object Transaction {
     }
   }
 
+  def balance(userId:UserId) = Balance(balanceBTC(userId), balanceSEK(userId), balanceReservedBTC(userId), balanceReservedSEK(userId))
 
-  def balanceSEK(userId: UserId) = SEK(balance(userId, UserSek))
+  def balanceSEK(userId: UserId):SEK = SEK(balance(userId, UserSek))
 
-  def balanceReservedSEK(userId: UserId) = SEK(balance(userId, UserReservedSek))
+  def balanceReservedSEK(userId: UserId):SEK = SEK(balance(userId, UserReservedSek))
 
-  def balanceBTC(userId: UserId) = BTC(balance(userId, UserBtc))
+  def balanceBTC(userId: UserId):BTC = BTC(balance(userId, UserBtc))
+
+  def balanceReservedBTC(userId: UserId):BTC = BTC(balance(userId, UserReservedBtc))
 
   def balance(userId: UserId, account: Account): BigDecimal = {
 

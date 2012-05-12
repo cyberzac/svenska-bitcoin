@@ -11,9 +11,8 @@ object PlayActorService {
   val duration = timeout.duration
   // Todo use play.akka
   val system = ActorSystem("SvenskaBitcoinSystem")
-  val tradeService = InMemoryTradeService[BTC, SEK]()
   val falloutActor = system.actorOf(Props[FalloutActor])
-  val orderBookActor = system.actorOf(Props(new OrderBookActor[BTC, SEK](tradeService)), "orderBook")
+  val orderBookActor = system.actorOf(Props(new OrderBookActor[BTC, SEK]()), "orderBook")
   val log = LoggerFactory.getLogger(this.getClass)
 
   // Todo: Make this a LRU cache
@@ -35,7 +34,7 @@ object PlayActorService {
     if (user.isAdmin) {
       return Some(AdminUser(user))
     }
-    return None
+    None
   }
 
   def getUserActor(userId: UserId): ActorRef = {
@@ -58,7 +57,7 @@ object PlayActorService {
   }
 
   def updateBalance(user: User): Option[User] = {
-    val balance = tradeService.sumByUser(user.userId)
+    val balance = Transaction.balance(user.userId)
     log.debug("Sum of trades are {}", balance)
     Some(user.copy(balance = balance))
   }
@@ -81,7 +80,7 @@ object PlayActorService {
     User.create(name, email, password)
   }
 
-  def getTrades(user: User): List[Trade[BTC, SEK]] = tradeService.getTrades(user.userId)
+  def getTrades(user: User): List[Trade[BTC, SEK]] = Trade.getTrades(user.userId)
 
   def getUserTransactions(user: User): List[Transaction] = null
 }

@@ -21,6 +21,7 @@ case class Trade[A <: Currency[A], P <: Currency[P]](id: Option[Pk[Long]], amoun
 
 object Trade {
 
+
   /**
    * Parse a User from a ResultSet
    */
@@ -55,6 +56,14 @@ object Trade {
     create(Trade(None, amount, price, sellerId, buyerId, time))
   }
 
+  def getTrades(userId: UserId): scala.List[Trade[BTC, SEK]] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL("select * from trans").as(Trade.simple *)
+    }
+  }
+
+
   def create[A <: Currency[A], P <: Currency[P]](trade: Trade[A, P]): Trade[A, P] = {
     DB.withConnection {
       implicit connection =>
@@ -64,24 +73,24 @@ object Trade {
 
         SQL(
           """
-            insert into user values (
+            insert into trade values (
               {id},
               {amount},
               {price},
               {sellerId},
-              {buerId},
+              {buyerId},
               {created}
             )
           """
         ).on(
           'id -> id,
-          'amount -> trade.amount.value,
-          'price -> trade.price.value,
-          'sellerId -> trade.sellerId,
-          'buyerId -> trade.buyerId,
+          'amount -> new java.math.BigDecimal(trade.amount.value.toString()),
+          'price -> new java.math.BigDecimal(trade.price.value.toString()),
+          'sellerId -> trade.sellerId.value,
+          'buyerId -> trade.buyerId.value,
           'created -> trade.date
         ).executeUpdate()
-        val t = trade.copy(id = Some(Id(id)))
+        val t: Trade[A, P] = trade.copy(id = Some(Id(id)))
         log.debug("Stored trade {}", t)
         t
     }

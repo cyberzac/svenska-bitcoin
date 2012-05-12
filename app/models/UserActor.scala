@@ -13,7 +13,6 @@ class UserActor(val userId: UserId) extends Actor {
       log.info("Ignoring trade with myself " + trade)
     }
     case trade@Trade(id: TradeId, amount: BTC, price: SEK, seller, `userId`, time: Long) => {
-      // Todo replace with sum of matching trades in TradeService
       val user = User.findById(userId).get
       log.info(user.name + " bought " + amount + " at " + price + "/BTC")
     }

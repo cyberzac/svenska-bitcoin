@@ -3,6 +3,7 @@ package models
 import org.specs2.mutable.Specification
 import play.api.test.Helpers._
 import play.api.test.FakeApplication
+import models._
 
 class PlayActorServiceSpec extends Specification {
 

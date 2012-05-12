@@ -2,6 +2,8 @@ package models
 
 import org.specs2.mutable.Specification
 import org.specs2.execute.Success
+import play.api.test.FakeApplication
+import play.api.test.Helpers._
 
 class OrderBookSpec extends Specification {
 
@@ -10,12 +12,12 @@ class OrderBookSpec extends Specification {
 
   "An OrderBook" should {
 
-    "Que an AskOrder if no match is possible" in {
+    "Que an AskOrder if no match is possible" in running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 10)).isEmpty must_== true
     }
 
-    "Que AskOrders in rising order" in {
+    "Que AskOrders in rising order" in running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 10)).isEmpty must_== true
       dut.matchOrder(ask(5, 9)).isEmpty must_== true
@@ -24,14 +26,14 @@ class OrderBookSpec extends Specification {
       dut.bidOrders.isEmpty must_== true
     }
 
-    "Que an BidOrder if no asks are present" in {
+    "Que an BidOrder if no asks are present" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(bid(3, 10)).isEmpty must_== true
       dut.askOrders.isEmpty must_== true
       verifyOrders(dut.bidOrders, bid(3, 10))
     }
 
-    "Que an BidOrder if no match is possible" in {
+    "Que an BidOrder if no match is possible" in  running(FakeApplication()) {
 
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 11)).isEmpty must_== true
@@ -40,7 +42,7 @@ class OrderBookSpec extends Specification {
       verifyOrders(dut.bidOrders, bid(3, 10))
     }
 
-    "Que BidOrders in falling order" in {
+    "Que BidOrders in falling order" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(bid(3, 10)).isEmpty must_== true
       dut.matchOrder(bid(5, 9)).isEmpty must_== true
@@ -49,7 +51,7 @@ class OrderBookSpec extends Specification {
       dut.askOrders.isEmpty must_== true
     }
 
-    "Return a trade if ask and bid are equal for an bid order" in {
+    "Return a trade if ask and bid are equal for an bid order" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 9)).isEmpty must_== true
       val trade = dut.matchOrder(bid(5, 9))(0)
@@ -59,7 +61,7 @@ class OrderBookSpec extends Specification {
       trade.buyerId must_== buyerId
     }
 
-    "Remove orders in a matched trade for an bid order" in {
+    "Remove orders in a matched trade for an bid order" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 9)).isEmpty must_== true
       dut.matchOrder(bid(5, 9))(0)
@@ -67,7 +69,7 @@ class OrderBookSpec extends Specification {
       dut.bidOrders.isEmpty must_== true
     }
 
-    "Return a trade with the oldest price if the ask and bid overrun each other for a bid order" in {
+    "Return a trade with the oldest price if the ask and bid overrun each other for a bid order" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 9)).isEmpty must_== true
       val trade = dut.matchOrder(bid(5, 11))(0)
@@ -77,7 +79,7 @@ class OrderBookSpec extends Specification {
       trade.buyerId must_== buyerId
     }
 
-    "Return a partial trade if the ask and bid amounts differ" in {
+    "Return a partial trade if the ask and bid amounts differ" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 9)).isEmpty must_== true
       val trade = dut.matchOrder(bid(3, 10))(0)
@@ -87,21 +89,21 @@ class OrderBookSpec extends Specification {
       trade.buyerId must_== buyerId
     }
 
-    "Replace the ask order with an ask order with the remaing amount if the match bid amount was lower" in {
+    "Replace the ask order with an ask order with the remaing amount if the match bid amount was lower" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 9)).isEmpty must_== true
       dut.matchOrder(bid(3, 10))
       verifyOrders(dut.askOrders, ask(2, 9))
     }
 
-    "Replace the bid order with an bid order with the remaing amount if the match ask amount was lower" in {
+    "Replace the bid order with an bid order with the remaing amount if the match ask amount was lower" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(bid(9, 10)).isEmpty must_== true
       dut.matchOrder(ask(5, 9))
       verifyOrders(dut.bidOrders, bid(4, 10))
     }
 
-    "Match multiple asks and yield several Trades for one bid order" in {
+    "Match multiple asks and yield several Trades for one bid order" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(ask(5, 9)).isEmpty must_== true
       dut.matchOrder(ask(5, 10)).isEmpty must_== true
@@ -113,7 +115,7 @@ class OrderBookSpec extends Specification {
       verifyOrders(dut.bidOrders, bid(1, 10))
     }
 
-    "Match multiple bids and yield several Trades for one ask order" in {
+    "Match multiple bids and yield several Trades for one ask order" in  running(FakeApplication()) {
       val dut = new OrderBook[BTC, SEK]()
       dut.matchOrder(bid(3, 9)).isEmpty must_== true
       dut.matchOrder(bid(3, 10)).isEmpty must_== true
@@ -158,8 +160,6 @@ class OrderBookSpec extends Specification {
   /**
    * Verify that the amount, price, sellerId and buyerId are the same.
    * Ignore the time and id fields.
-   * @param actual
-   * @param expected
    */
   def compareTrade(actual: Trade[BTC, SEK], expected: Trade[BTC, SEK]) = {
     actual.amount must_== expected.amount

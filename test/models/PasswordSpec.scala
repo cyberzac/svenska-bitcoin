@@ -15,6 +15,10 @@ class PasswordSpec extends Specification {
       password.equals("wrong") must beFalse
     }
 
+    "have a digest" in {
+      password.digest.value must not beEmpty
+    }
+
     "be constructed from a digest" in {
       Password(password.digest).equals(clear) must beTrue
     }

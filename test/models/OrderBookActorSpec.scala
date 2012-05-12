@@ -33,7 +33,6 @@ class OrderBookActorSpec extends Specification with Mockito {
   implicit val system = ActorSystem("OrderBookActorSpec")
   val duration = Duration("5 seconds")
   implicit val timeout = Timeout(duration)
-  val tradeService = mock[TradeService[BTC, SEK]]
   val sellerId = UserId(1L)
   val askOrderSEK_10_5 = AskOrderSEK(BTC(10), SEK(5), sellerId)
   val askOrderSEK_10_6 = AskOrderSEK(BTC(10), SEK(6), sellerId)
@@ -43,7 +42,7 @@ class OrderBookActorSpec extends Specification with Mockito {
 
   "An OrderBookActor" should {
 
-    val orderBook = TestActorRef(new OrderBookActor[BTC, SEK](tradeService))
+    val orderBook = TestActorRef(new OrderBookActor[BTC, SEK]())
     orderBook ! askOrderSEK_10_5
     orderBook ! askOrderSEK_10_6
     orderBook ! bidOrderSEK_9_4
