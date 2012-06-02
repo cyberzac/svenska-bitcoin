@@ -79,7 +79,7 @@ object User {
           'id -> id,
           'name -> user.name.value,
           'email -> user.email.value,
-          'password -> user.password.digest,
+          'password -> user.password.digest.value,
           'created -> user.date
         ).executeUpdate()
         val u = user.copy(id = Some(Id(id)))
