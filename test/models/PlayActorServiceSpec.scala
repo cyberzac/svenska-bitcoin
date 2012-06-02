@@ -20,7 +20,7 @@ class PlayActorServiceSpec extends Specification {
       dut.getUserActor(UserId(-1)) must_== dut.falloutActor
     }
 
-    "'Return an ActorRef for an email of an existing user" in running(FakeApplication()) {
+    "Return an ActorRef for an email of an existing user" in running(FakeApplication()) {
       val user = dut.create("name", "email", "password")
       dut.getUserActor(user.email) must_!= dut.falloutActor
     }
