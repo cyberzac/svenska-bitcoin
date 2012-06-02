@@ -19,7 +19,7 @@ class packageSpec extends Specification {
     "convert a string to a Password" in {
       val clear = "clear"
       val password: Password = clear
-      password.equals(clear) must beTrue
+      password.matches(clear) must beTrue
     }
   }
   "convert a long to an UserId" in {

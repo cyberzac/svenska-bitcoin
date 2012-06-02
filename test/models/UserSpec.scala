@@ -12,7 +12,7 @@ class UserSpec extends Specification {
       val user = User.create(Name("name1"), Email("mail1"), "password1")
       user.name must_== Name("name1")
       user.email must_== Email("mail1")
-      user.password.equals("password1") must beTrue
+      user.password.matches("password1") must beTrue
       user.balance must_== Balance()
     }
 

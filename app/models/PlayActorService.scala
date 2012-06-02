@@ -18,20 +18,23 @@ object PlayActorService {
   // Todo: Make this a LRU cache
   var userActors = Map[Email, ActorRef]()
 
-  def authenticate(email: Email, password: String): Boolean = {
+  def authenticate(email: Email, clearPassword: String): Boolean = {
+    log.debug("Trying to authenticate {}", email)
     User.findByEmail(email).map {
       user =>
-        user.password.equals(password)
+        user.password.matches(clearPassword)
     }.getOrElse(false)
   }
 
   def getUserByEmail(email: Email): Option[User] = {
+    log.debug("Looking for a user {}", email)
     User.findByEmail(email).map(updateBalance(_)).getOrElse(return None)
   }
 
   def getAdminByEmail(email: Email): Option[AdminUser] = {
     val user = User.findByEmail(email).getOrElse(return None)
     if (user.isAdmin) {
+      log.debug("Admin user: {}", email)
       return Some(AdminUser(user))
     }
     None
@@ -52,13 +55,14 @@ object PlayActorService {
     userActors.getOrElse(user.email, {
       val actorRef = system.actorOf(Props(new UserActor(user.userId)), user.userId.value.toString)
       userActors = userActors + (user.email -> actorRef)
+      log.debug("Found actor for user {}", user.email)
       actorRef
     })
   }
 
   def updateBalance(user: User): Option[User] = {
     val balance = Transaction.balance(user.userId)
-    log.debug("Sum of trades are {}", balance)
+    log.debug("User {} balanace {}", user.email, balance)
     Some(user.copy(balance = balance))
   }
 
@@ -77,10 +81,11 @@ object PlayActorService {
 
   //Todo remove
   def create(name: Name, email: Email, password: String): User = {
+    log.debug("Creating user {}", email)
     User.create(name, email, password)
   }
 
   def getTrades(user: User): List[Trade[BTC, SEK]] = Trade.getTrades(user.userId)
 
-  def getUserTransactions(user: User): List[Transaction] = null
+  def getUserTransactions(user: User): Seq[Transaction] = Transaction.findTransactions(user.userId)
 }

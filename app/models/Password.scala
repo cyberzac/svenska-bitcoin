@@ -23,7 +23,7 @@ object Password {
 case class PasswordDigest(value:String)
 
 case class Password(digest: PasswordDigest) {
-  def equals(clear: String): Boolean = {
+  def matches(clear: String): Boolean = {
     Password.digester.matches(clear, digest.value)
   }
 
