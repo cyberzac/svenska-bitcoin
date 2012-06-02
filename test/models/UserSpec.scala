@@ -8,32 +8,35 @@ class UserSpec extends Specification {
 
   "A User " should {
 
+    val password = "password1"
+
     "have a create method" in running(FakeApplication()) {
-      val user = User.create(Name("name1"), Email("mail1"), "password1")
-      user.name must_== Name("name1")
-      user.email must_== Email("mail1")
-      user.password.matches("password1") must beTrue
-      user.balance must_== Balance()
+      val expected = User.create("name1", "mail1", password)
+      val user = User.findById(expected.userId)
+      verifyUser(user, expected)
+      user.get.password.matches(password) must beTrue
+      user.get.balance must_== Balance()
     }
 
     "Throw exception if trying to create new user the the same email" in running(FakeApplication()) {
-      User.create(Name("name1"), Email("mail1"), "password1")
-      User.create(Name("name2"), Email("mail1"), "password2") must throwAn[Exception]
+      User.create("name1", "mail1", password)
+      User.create("name2", "mail1", "password2") must throwAn[Exception]
     }
 
     "Find a user by email" in running(FakeApplication()) {
-      val expected = User.create(Name("name1"), Email("mail1"), "password1")
-      val actual = User.findByEmail(Email("mail1")).get
+      val expected = User.create("name1", "mail1", password)
+      val actual = User.findByEmail("mail1").get
       verifyUser(Some(actual), expected)
+      actual.password.matches(password) must beTrue
     }
 
     "Return None for an unknown mail" in running(FakeApplication()) {
-      val found = User.findByEmail(Email("mail1"))
+      val found = User.findByEmail("mail1")
       found must beNone
     }
 
     "Find a user by id" in running(FakeApplication()) {
-      val created = User.create(Name("name1"), Email("mail1"), "password1")
+      val created = User.create("name1", "mail1", password)
       val found = User.findById(created.id.get)
       verifyUser(found, created)
     }
@@ -44,7 +47,7 @@ class UserSpec extends Specification {
     }
 
     "Update an existing user" in running(FakeApplication()) {
-      val created = User.create("name1", "mail1", "password1")
+      val created = User.create("name1", "mail1", password)
       val changed = created.copy(email = Email("mail2"))
       val updated = User.update(changed)
       updated must_== changed
@@ -57,7 +60,7 @@ class UserSpec extends Specification {
     }
 
       "Throw an exception when trying to update the email to another users email" in running(FakeApplication()){
-        val created = User.create("name1", "mail1", "password1")
+        val created = User.create("name1", "mail1", password)
         User.create("name2", "mail2", "password2")
         val changed = created.copy(email = Email("mail2"))
         User.update(changed) must throwAn[Exception]
