@@ -52,7 +52,7 @@ object NotLoggedIn extends Controller {
       "password" -> text
     ) verifying("Felaktig inlogging", result => result match {
       case (email, password) => {
-        Logger.debug("login %s:%s".format(email, password))
+        Logger.debug("login %s:********".format(email))
         PlayActorService.authenticate(Email(email), password)
       }
     })
