@@ -11,6 +11,7 @@ import scala.Predef._
 
 case class Trade[A <: Currency[A], P <: Currency[P]](id: Option[Pk[Long]], amount: A, price: P, sellerId: UserId, buyerId: UserId, time: Long) {
 
+  def tradeId = TradeId(id.getOrElse(throw new IllegalStateException("Trade not stored")).get)
 
   val dateTime = new DateTime(time)
 
@@ -19,8 +20,9 @@ case class Trade[A <: Currency[A], P <: Currency[P]](id: Option[Pk[Long]], amoun
   val total = price * amount.value
 }
 
-object Trade {
+case class TradeId(value:Long)
 
+object Trade {
 
   /**
    * Parse a User from a ResultSet
@@ -65,6 +67,7 @@ object Trade {
 
 
   def create[A <: Currency[A], P <: Currency[P]](trade: Trade[A, P]): Trade[A, P] = {
+    log.info("Creating trade {}", trade)
     DB.withConnection {
       implicit connection =>
 

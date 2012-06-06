@@ -2,8 +2,6 @@ import anorm.Pk
 
 package object models {
 
-  type TradeId = Option[Pk[Long]]
-
   implicit def stringToName(name: String) = Name(name)
 
   implicit def stringToEmail(email: String) = Email(email)

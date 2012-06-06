@@ -20,25 +20,26 @@ class TransactionSpec extends Specification {
     val btcAmount = 3.14
     val btc = BTC(btcAmount)
     val bitcoinAddressReference = BtcAddressReference("1Fxxx")
+    val tradeReference = TradeReference("1")
 
     "have a dateTime" in {
-      val transaction = Transaction(Some(Id(1000)), userId, Debit(100, BankSek), Credit(100, UserBtc), bankRef.value, time)
+      val transaction = Transaction(Some(Id(1000)), Debit(100, BankSek), Credit(100, UserBtc), bankRef.value, time)
       transaction.dateTime must_== new DateTime(time)
     }
 
     "have a date" in {
-      val transaction = Transaction(Some(Id(1000)), userId, Debit(100, BankSek), Credit(100, UserBtc), bankRef.value, time)
+      val transaction = Transaction(Some(Id(1000)), Debit(100, BankSek), Credit(100, UserBtc), bankRef.value, time)
       transaction.date must_== new Date(time)
     }
 
     "Provide a add SEK fund transaction" in running(FakeApplication()) {
       val t = Transaction.fund(userId, sek, bankRef, time)
-      t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, BankSek), Credit(sekAmount, UserSek), bankRef.value, time)
+      t must_== Transaction(Some(Id(1000)), Debit(sekAmount, BankSek), Credit(sekAmount, UserSek, userId), bankRef.value, time)
     }
 
     "Provide a subtract SEK fund transaction" in running(FakeApplication()) {
       val t = Transaction.fund(userId, -sek, bankRef, time)
-      t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, UserSek), Credit(sekAmount, BankSek), bankRef.value, time)
+      t must_== Transaction(Some(Id(1000)), Debit(sekAmount, UserSek, userId), Credit(sekAmount, BankSek), bankRef.value, time)
     }
 
 
@@ -63,7 +64,7 @@ class TransactionSpec extends Specification {
 
     "Provide a reserve SEK fund transaction" in running(FakeApplication()) {
       val t = Transaction.reserve(userId, sek, orderRef, time)
-      t must_== Transaction(Some(Id(1000)), userId, Debit(sekAmount, UserSek), Credit(sekAmount, UserReservedSek), bankRef.value, time)
+      t must_== Transaction(Some(Id(1000)), Debit(sekAmount, UserSek, userId), Credit(sekAmount, UserReservedSek, userId), bankRef.value, time)
     }
 
     "Provide a balanceReservedSek method yielding the sum of all UserReservedSek transactions" in running(FakeApplication()) {
@@ -81,13 +82,21 @@ class TransactionSpec extends Specification {
 
     "Provide a reserve BTC fund transaction" in running(FakeApplication()) {
       val t = Transaction.reserve(userId, btc, orderRef, time)
-      t must_== Transaction(Some(Id(1000)), userId, Debit(btcAmount, UserBtc), Credit(btcAmount, UserReservedBtc), bankRef.value, time)
+      t must_== Transaction(Some(Id(1000)), Debit(btcAmount, UserBtc, userId), Credit(btcAmount, UserReservedBtc, userId), bankRef.value, time)
     }
 
     "Provide a balanceReservedBTC fund transaction" in running(FakeApplication()) {
       Transaction.fund(userId, btc, bitcoinAddressReference, time)
       Transaction.reserve(userId, btc, orderRef, time)
       Transaction.balanceReservedBTC(userId) must_== btc
+    }
+
+
+    "Provide a trade transaction" in running(FakeApplication()) {
+    /*  Transaction.fund(userId, btc, bitcoinAddressReference, time)
+      Transaction.reserve(userId, btc, orderRef, time)
+      Transaction.trade(userId, btc, tradeReference, time)
+    */
     }
 
     "Provide a balance function" in running(FakeApplication()) {
@@ -101,8 +110,8 @@ class TransactionSpec extends Specification {
       running(FakeApplication()) {
         Transaction.fund(userId, sek, bankRef, time)
         Transaction.fund(userId, -sek, bankRef, time)
-        val t1 = Transaction(Some(Id(1000)), userId, Debit(sekAmount, BankSek), Credit(sekAmount, UserSek), bankRef.value, time)
-        val t2 = Transaction(Some(Id(1001)), userId, Debit(sekAmount, UserSek), Credit(sekAmount, BankSek), bankRef.value, time)
+        val t1 = Transaction(Some(Id(1000)), Debit(sekAmount, BankSek), Credit(sekAmount, UserSek, userId), bankRef.value, time)
+        val t2 = Transaction(Some(Id(1001)), Debit(sekAmount, UserSek, userId), Credit(sekAmount, BankSek), bankRef.value, time)
         Transaction.findTransactions(userId) must_== Seq(t1, t2)
       }
     }

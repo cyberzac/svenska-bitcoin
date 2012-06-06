@@ -26,6 +26,10 @@ case class Name(value: String)
 
 case class UserId(value: Long)
 
+object UserId {
+val svenskaBitcoin = UserId(0)
+}
+
 object User {
 
   // -- Parsers
@@ -83,7 +87,7 @@ object User {
           'created -> user.date
         ).executeUpdate()
         val u = user.copy(id = Some(Id(id)))
-        log.debug("Stored user {}", u)
+        log.info("Stored user {}", u)
         u
     }
   }

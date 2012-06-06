@@ -8,9 +8,11 @@ import views._
 import models._
 import akka.pattern.ask
 import akka.dispatch.Await
+import org.slf4j.LoggerFactory
 
 object Application extends Controller with Secured {
 
+ val log = LoggerFactory.getLogger(getClass)
   /**
    * Home page
    */
