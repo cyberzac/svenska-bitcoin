@@ -8,3 +8,4 @@ tmp
 .idea_modules/
 dist/
 .history
+out/
